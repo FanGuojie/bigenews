@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import garbagemayor.bigenews.newssrc.PageItem;
+
 /*
  *  RecyclerView嵌套CardView的适配器
  */
@@ -17,24 +19,24 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     private Context mContext;
 
-    private List<NewsItem> mNewsList;
+    private List<PageItem> mNewsList;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView newsTitle;
-        TextView newsContent;
+        TextView newsIntro;
         TextView newsTime;
 
         public ViewHolder(View view) {
             super(view);
             cardView = (CardView) view;
             newsTitle = (TextView) view.findViewById(R.id.news_title);
-            newsContent = (TextView) view.findViewById(R.id.news_content);
+            newsIntro = (TextView) view.findViewById(R.id.news_intro);
             newsTime = (TextView) view.findViewById(R.id.news_time);
         }
     }
 
-    public NewsAdapter(List<NewsItem> newsList) {
+    public NewsAdapter(List<PageItem> newsList) {
         mNewsList = newsList;
     }
 
@@ -49,10 +51,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        NewsItem newsItem = mNewsList.get(position);
-        holder.newsTitle.setText(newsItem.getTitle());
-        holder.newsContent.setText(newsItem.getContent());
-        holder.newsTime.setText(newsItem.getTime());
+        PageItem pageItem = mNewsList.get(position);
+        holder.newsTitle.setText(pageItem.getTitle());
+        holder.newsIntro.setText(pageItem.getIntro());
+        holder.newsTime.setText(pageItem.getTime());
     }
 
     @Override

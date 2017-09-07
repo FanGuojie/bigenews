@@ -1,6 +1,5 @@
 package garbagemayor.bigenews;
 
-import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,30 +8,32 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+
+import garbagemayor.bigenews.newssrc.PagePlus;
+import garbagemayor.bigenews.newssrc.PageItem;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivityTag";
 
     private DrawerLayout mDrawerLayout;
     private RecyclerView mRecyclerView;
     private StaggeredGridLayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private PagePlus mPage;
+    private int mPageId;
+    private static int mPageSize = 20;
 
     //上次点击“退出”按钮的时间
     private Date lastPressQuit = null;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private int visibleThreshold = 5;
 
     //新闻内容
-    private List<NewsItem> mNewsList = new ArrayList<>();
+    private List<PageItem> mNewsList = new ArrayList<>();
     private NewsAdapter mAdapter;
 
 
@@ -48,20 +49,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
+        Log.e(TAG, "Main::onCreate()");
 
         //用ToolBar代替ActionBar
         initToolBar();
-
         //侧滑菜单里的按钮的行为
         initNavigationView();
-
-        //新闻模块的显示，下拉刷新，自动加载
+        //新闻模块的显示，下拉刷新，自动加载的功能
         initShowNews();
-        //填充新闻内容
+        //第一页新闻
         refreshNews();
-
         //悬浮按钮
         initBackToTopButtom();
+
     }
 
     //用ToolBar代替ActionBar
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
     private void initShowNews() {
         //RecyclerView里面初始化
         mRecyclerView = (RecyclerView) findViewById(R.id.main_news_list);
-        mLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new NewsAdapter(mNewsList);
         mRecyclerView.setAdapter(mAdapter);
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 if(lastPos >= (itemCount - visibleThreshold)) {
-                    loadNewNews(20);
+                    loadAPageOfNewNews();
                 }
             }
         });
@@ -199,59 +199,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    //新闻刷新
-    private void refreshNews() {
-        mSwipeRefreshLayout.setRefreshing(true);
-        isLoading = true;
+    /*
+    //预处理新闻显示模块
+    private void initNewsSrc() {
+        Log.d(TAG, "initNewsSrc start");
+        mPageId = 1;
+        mPageSize = 20;
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mNewsList.clear();
-                        mAdapter.notifyDataSetChanged();
-                        loadNewNews(20);
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        isLoading = false;
-                    }
-                });
+                Log.d(TAG, "initNewsSrc new Thread");
+                mPage = new PagePlus(mPageId, mPageSize);
             }
         }).start();
+        Log.d(TAG, "initNewsSrc finish");
+    }
+    */
+    //刷新，得到第一页新闻
+    private void refreshNews() {
+        mSwipeRefreshLayout.setRefreshing(true);
+        mNewsList.clear();
+        mAdapter.notifyDataSetChanged();
+        mPageId = 0;
+        loadAPageOfNewNews();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
     //向RecyclerView里加入新的新闻
-    private void loadNewNews(int cnt) {
+    private void loadAPageOfNewNews() {
         isLoading = true;
-        int n = mNewsList.size();
-        for(int i = 0; i < cnt; i ++) {
-            NewsItem news = getOneNews(n + i);
-            mNewsList.add(n + i, news);
-            mAdapter.notifyItemInserted(n + i);
+        Log.d(TAG,"loadAPageOfNewNews");
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mPage = new PagePlus(++mPageId, mPageSize);
+                Log.d(TAG,"loadAPageOfNewNews Thread finish");
+            }
+        });
+        t.start();
+        try {
+            t.join(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG,"loadAPageOfNewNews main finish");
+        for(PageItem pageItem: mPage.cont) {
+            mNewsList.add(pageItem);
+            mAdapter.notifyItemInserted(mNewsList.size());
         }
         isLoading = false;
-    }
-    //向后加载cnt条新闻
-    private NewsItem getOneNews(int i) {
-
-
-
-
-
-        //用随机数字串作为新闻内容
-        Random random = new Random();
-        String title = "第" + i + "条新闻";
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        String content = "";
-        int contentLength = random.nextInt(300);
-        for (int j = 0; j < contentLength; j++) {
-            content = content + random.nextInt(10);
-        }
-        return new NewsItem(title, content, time);
     }
     //设置返回顶部的按钮
     private void initBackToTopButtom() {
