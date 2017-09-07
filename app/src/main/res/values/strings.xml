@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">Bige News</string>
+    <string name="app_name">哔嗝资讯</string>
+    <string name="refresh">刷新</string>
+    <string name="setting">设置</string>
+    <string name="quit">退出</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="skip">跳过</string>
+    <string name="loading...">正在加载...</string>
+    <string name="homepage">首页</string>
+    <string name="history">历史</string>
+    <string name="favorite">收藏夹</string>
+    <string name="unregistered">未登录</string>
+    <string name="back_to_top">回到顶部</string>
+
 </resources>
