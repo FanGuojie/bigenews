@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javafx.scene.effect.DropShadowBuilder;
 import net.sf.json.*;
 import com.google.gson.*;
 
@@ -34,6 +33,24 @@ class Content {
     }
     public String getId() {
         return news_ID;
+    }
+    public String getClassTag() {
+        return newsClassTag;
+    }
+    public String getSource() {
+        return news_Source;
+    }
+    public String getAuthor() {
+        return news_Author;
+    }
+    public String getTitle() {
+        return news_Title;
+    }
+    public String getTime() {
+        return news_Time;
+    }
+    public String getIntro() {
+        return news_Intro;
     }
 }
 
@@ -88,8 +105,12 @@ class Detail {
 
 public class Page {
     private news n;
+    public Content[] cont;
     public Page(int No, int Size) {
         this(String.format("http://166.111.68.66:2042/news/action/query/latest?pageNo=%d&pageSize=%d", No, Size));
+    }
+    public Page(int category, int No, int Size){
+        this(String.format("http://166.111.68.66:2042/news/action/query/latest?category=%d&pageNo=%d&pageSize=%d", category, No, Size));
     }
     public Page(String keyword, int category, int No, int Size){
         this(String.format("http://166.111.68.66:2042/news/action/query/search?keyword=%s&category=%d&pageNo=%d&pageSize=%d", keyword, category, No, Size));
@@ -124,8 +145,12 @@ public class Page {
         Gson gson = new GsonBuilder().create();
         news n1 = gson.fromJson(result, news.class);
         n=n1;
+        cont = n.getContent();
     }
     public Detail getdetails(int id) {
+        Detail d=new Detail();
+        if (id >= cont.length)
+            return d;
         Content[] c = n.getContent();
         String result = "";
         BufferedReader in = null;
@@ -154,13 +179,37 @@ public class Page {
             }
         }
         Gson gson = new GsonBuilder().create();
-        Detail d = gson.fromJson(result, Detail.class);
-        System.out.println(d.getContent());
+        d = gson.fromJson(result, Detail.class);
+        //System.out.println(d.getContent());
         return d;
 
     }
     public String print() {
         return n.print();
+    }
+    public int getLength() {
+        return cont.length;
+    }
+    public String getId(int id) {
+        return cont[id].getId();
+    }
+    public String getClassTag(int id) {
+        return cont[id].getClassTag();
+    }
+    public String getSource(int id) {
+        return cont[id].getSource();
+    }
+    public String getAuthor(int id) {
+        return cont[id].getAuthor();
+    }
+    public String getTitle(int id) {
+        return cont[id].getTitle();
+    }
+    public String getTime(int id) {
+        return cont[id].getTime();
+    }
+    public String getIntro(int id) {
+        return cont[id].getIntro();
     }
 }
 
