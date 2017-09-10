@@ -7,10 +7,10 @@ import retrofit2.http.Query;
 public interface NewsAPI {
 
     @GET("latest?")
-    Call<News> latest(@Query("pageNo") int no, @Query("pageSize") int size);
+    Call<NewsList> latest(@Query("pageNo") int no, @Query("pageSize") int size);
 
     @GET("search?")
-    Call<News> search(
+    Call<NewsList> search(
             @Query("keyword") String keyword,
             @Query("category") String category,
             @Query("pageNo") int no,
@@ -18,8 +18,8 @@ public interface NewsAPI {
     );
 
     @GET("latest?")
-    Call<News> category(@Query("category") int id, @Query("pageNo") int no, @Query("pageSize") int size);
+    Call<NewsList> category(@Query("category") int id, @Query("pageNo") int no, @Query("pageSize") int size);
 
     @GET("detail?")
-    Call<NewsContent> detail(@Query("newsId") String id);
+    Call<NewsDetail> detail(@Query("newsId") String id);
 }
