@@ -7,11 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 public class WelcomeActivity extends AppCompatActivity {
 
     private static final String TAG = "WelcomeActivity";
-    private Handler handler;
+    private Handler mHandler;
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,16 +24,19 @@ public class WelcomeActivity extends AppCompatActivity {
         Log.d(TAG, "隐藏状态栏");
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        //设置滚动条属性
+        mTextView = (TextView) findViewById(R.id.adv_text);
+
         //欢迎界面持续3秒
         Log.d(TAG, "等待3秒");
-        handler = new Handler() {
+        mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 getHome();
                 super.handleMessage(msg);
             }
         };
-        handler.sendEmptyMessageDelayed(0,500);
+        mHandler.sendEmptyMessageDelayed(0,2000);
     }
 
     public void getHome(){

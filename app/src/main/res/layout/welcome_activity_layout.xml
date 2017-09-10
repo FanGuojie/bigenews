@@ -5,13 +5,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
+        android:layout_width="324dp"
+        android:layout_height="576dp"
+        android:layout_margin="20dp"
+        android:layout_gravity="center_horizontal"
         android:id="@+id/welcome_image"
         android:src="@mipmap/welcome"
+        />
+
+    <TextView
+        android:id="@+id/adv_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_gravity="center"
+        android:text="@string/advertisement"
+        android:textSize="30sp"
+        android:textColor="?attr/colorPrimary"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:shadowColor="@color/colorPrimary"
+        android:shadowDx="10"
+        android:shadowDy="10"
+        android:shadowRadius="10"
         />
 
 </LinearLayout>
