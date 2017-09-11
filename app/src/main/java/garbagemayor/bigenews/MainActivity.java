@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity{
                     Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
+                    intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
                     startActivity(intent);
                 }
             }
