@@ -44,6 +44,8 @@ public class PageItem {
     public String getIntro() {
         return news_Intro;
     }
+    public String getPictures() {return news_Pictures; }
+
 
     public String print() {
         return "newsClassTag; " + newsClassTag + "\n" +
@@ -57,7 +59,7 @@ public class PageItem {
         NewsItem d=new NewsItem();
         String result = "";
         BufferedReader in = null;
-        String urlNameString = String.format("http://166.111.68.66:2042/news/action/query/NewsItem?newsId=" + news_ID);
+        String urlNameString = String.format("http://166.111.68.66:2042/news/action/query/detail?newsId=" + news_ID);
         try {
             URL realUrl = new URL(urlNameString);
             URLConnection connection = realUrl.openConnection();
