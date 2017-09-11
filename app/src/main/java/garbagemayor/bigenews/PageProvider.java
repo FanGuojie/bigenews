@@ -1,5 +1,6 @@
 package garbagemayor.bigenews;
 
+import android.os.AsyncTask;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -9,9 +10,11 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -56,8 +59,14 @@ public class PageProvider {
         api = retrofit.create(NewsAPI.class);
     }
 
+
     void loadNewsList(int no, int size) {
         Call<NewsList> call = api.latest(no, size);
+//        try {
+//            newsList = call.execute().body().getList();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         call.enqueue(new Callback<NewsList>() {
             @Override
             public void onResponse(Call<NewsList> call, Response<NewsList> response) {
@@ -75,6 +84,11 @@ public class PageProvider {
     void loadNewsDetail(String id) {
         Call<NewsDetail> call = api.detail(id);
         // load details for certain news id
+//        try {
+//            newsDetail = call.execute().body();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         call.enqueue(new Callback<NewsDetail>() {
             @Override
             public void onResponse(Call<NewsDetail> call, Response<NewsDetail> response) {

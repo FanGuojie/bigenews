@@ -20,7 +20,6 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
     private int mCount = 1;
     private RecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView mRecyclerView;
-    PageProvider pageProvider;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,7 +30,6 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        pageProvider = new PageProvider();
         mPullLoadMoreRecyclerView = (PullLoadMoreRecyclerView) view.findViewById(R.id.pullLoadMoreRecyclerView);
         //获取mRecyclerView对象
         mRecyclerView = mPullLoadMoreRecyclerView.getRecyclerView();
@@ -67,7 +65,7 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mRecyclerViewAdapter.addAllData(setList());
+                        mRecyclerViewAdapter.addAllData(MainActivity.pageProvider.getNewsList(1, 20));
                         mPullLoadMoreRecyclerView.setPullLoadMoreCompleted();
                     }
                 });
@@ -77,14 +75,9 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
 
     }
 
-    public void clearData() {
+    private void setRefresh() {
         mRecyclerViewAdapter.clearData();
-        mRecyclerViewAdapter.notifyDataSetChanged();
-    }
-
-
-    private List<NewsList.ListBean> setList() {
-        return pageProvider.getNewsList(0, 20);
+        mCount = 1;
     }
 
     @Override
@@ -101,8 +94,4 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
         getData();
     }
 
-    private void setRefresh() {
-        mRecyclerViewAdapter.clearData();
-        mCount = 1;
-    }
 }

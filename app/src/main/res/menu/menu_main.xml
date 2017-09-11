@@ -7,11 +7,6 @@
         android:id="@+id/menu_about"
         android:title="关于" />
     <item
-        android:id="@+id/add_item"
-        android:title="Add"
-        />
-    <item
-        android:id="@+id/remove_item"
-        android:title="Remove"
-        />
+        android:id="@+id/menu_voice"
+        android:title="念诗" />
 </menu>

@@ -16,6 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 //    private SecondFragment secondFragment;
 //    private ThirdFragment thirdFragment;
     private Thread thread;
+    public static PageProvider pageProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
 //        if (actionBar != null) {
 //            actionBar.setDisplayHomeAsUpEnabled(true);
 //        }
-
+        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=59b15923");
+        pageProvider = new PageProvider();
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -118,17 +123,6 @@ public class MainActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.menu_clear:
-                Toast.makeText(MainActivity.this, "First清除成功", Toast.LENGTH_LONG).show();
-                firstFragment.clearData();
-                break;
-            case R.id.menu_about:
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("https://github.com/WuXiaolong/PullLoadMoreRecyclerView"));
-                startActivity(intent);
-                break;
-        }
 
         return true;
     }
