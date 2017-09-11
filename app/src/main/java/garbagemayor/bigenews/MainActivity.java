@@ -1,5 +1,6 @@
 package garbagemayor.bigenews;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -237,6 +238,9 @@ public class MainActivity extends AppCompatActivity{
                 PageItem pageItem = mNewsList.get(postion);
                 if(pageItem != null){
                     Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, ViewActivity.class);
+                    intent.putExtra("id", pageItem.getId());
+                    startActivity(intent);
                 }
             }
         });
