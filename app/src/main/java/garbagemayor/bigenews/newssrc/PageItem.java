@@ -1,6 +1,14 @@
 package garbagemayor.bigenews.newssrc;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+
 public class PageItem {
     private String newsClassTag;            //<!--新闻所属的分类-->
     private String news_ID;                  //<!-- 新闻id-->
@@ -14,13 +22,7 @@ public class PageItem {
     private String news_Video;
     private String news_Intro;             //<!-- 简介 -->
 
-    public String print() {
-        return "newsClassTag; " + newsClassTag + "\n" +
-                "Source: " + news_Source + "\n" +
-                "Title: " + news_Title + "\n" +
-                "Time: " + news_Time+ "\n" +
-                "ID: " + news_ID + "\n";
-    }
+
     public String getId() {
         return news_ID;
     }
@@ -41,5 +43,47 @@ public class PageItem {
     }
     public String getIntro() {
         return news_Intro;
+    }
+
+    public String print() {
+        return "newsClassTag; " + newsClassTag + "\n" +
+                "Source: " + news_Source + "\n" +
+                "Title: " + news_Title + "\n" +
+                "Time: " + news_Time+ "\n" +
+                "ID: " + news_ID + "\n";
+    }
+
+    public NewsItem getNewsItem() {
+        NewsItem d=new NewsItem();
+        String result = "";
+        BufferedReader in = null;
+        String urlNameString = String.format("http://166.111.68.66:2042/news/action/query/NewsItem?newsId=" + news_ID);
+        try {
+            URL realUrl = new URL(urlNameString);
+            URLConnection connection = realUrl.openConnection();
+            connection.connect();
+            in = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+        } catch (Exception e) {
+            System.out.println("无网络连接" + e);
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+        Gson gson = new GsonBuilder().create();
+        d = gson.fromJson(result, NewsItem.class);
+        //System.out.println(d.getPageItem());
+        return d;
     }
 }

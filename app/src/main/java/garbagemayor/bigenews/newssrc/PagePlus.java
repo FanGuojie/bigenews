@@ -65,6 +65,44 @@ public class PagePlus {
 
 
     }
+
+    public static NewsItem getNewsItem(String id) {
+        NewsItem d = new NewsItem();
+        String result = "";
+        Log.d("ViewActivityTag", "result"+ result);
+        BufferedReader in = null;
+        String urlNameString = "http://166.111.68.66:2042/news/action/query/detail?newsId=" + id;
+        try {
+            URL realUrl = new URL(urlNameString);
+            URLConnection connection = realUrl.openConnection();
+            connection.connect();
+            in = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+        } catch (Exception e) {
+            Log.d("ViewActivityTag", "无网络连接" + e);
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+        Log.d("ViewActivityTag", result);
+        Gson gson = new GsonBuilder().create();
+        d = gson.fromJson(result, NewsItem.class);
+        //System.out.println(d.getPageItem());
+        return d;
+
+    }
+
     public NewsItem getNewsItem(int id) {
         NewsItem d=new NewsItem();
         if (id >= cont.length)
@@ -72,7 +110,7 @@ public class PagePlus {
         PageItem[] c = n.getPageItem();
         String result = "";
         BufferedReader in = null;
-        String urlNameString = String.format("http://166.111.68.66:2042/news/action/query/NewsItem?newsId="+c[id].getId());
+        String urlNameString = String.format("http://166.111.68.66:2042/news/action/query/detail?newsId="+c[id].getId());
         try {
             URL realUrl = new URL(urlNameString);
             URLConnection connection = realUrl.openConnection();
