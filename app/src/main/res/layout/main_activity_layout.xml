@@ -41,26 +41,35 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <!-- 多重筛选，横向的相对布局，依次是“类别”、“时间”、“搜索关键字” -->
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/main_filter"
                 android:layout_alignParentTop="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary">
+                android:background="@color/colorPrimary"
+                android:divider="@drawable/filter_divider_shape"
+                android:showDividers="middle">
 
                 <!-- 类别筛选，点击开关可以打开一个 -->
                 <Button
                     android:id="@+id/main_filter_category"
-                    android:layout_alignParentLeft="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/category"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@android:color/white"
+                    android:background="@color/colorPrimaryDark"
+                    />
+                <Button
+                    android:id="@+id/main_filter_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="搜索"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
                     android:background="@color/colorPrimaryDark"
                     />
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <!-- 新闻浏览部分，下拉刷新要给RecyclerView套一个SwipeRefreshLayout在外面，而RecyclerView里面每条新闻的模式在另一个xml里 -->
             <android.support.v4.widget.SwipeRefreshLayout
@@ -73,6 +82,7 @@
                     android:id="@+id/main_news_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:scrollbars="horizontal"
                     />
 
             </android.support.v4.widget.SwipeRefreshLayout>

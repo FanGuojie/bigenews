@@ -61,9 +61,9 @@ public class PagePlus {
         //System.out.println(result);
         Gson gson = new GsonBuilder().create();
         n = gson.fromJson(result, News.class);
-        cont = n.getPageItem();
-
-
+        if (n != null) {
+            cont = n.getPageItem();
+        }
     }
     public NewsItem getNewsItem(int id) {
         NewsItem d=new NewsItem();
