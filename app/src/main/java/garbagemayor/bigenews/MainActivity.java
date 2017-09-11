@@ -1,7 +1,5 @@
 package garbagemayor.bigenews;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,18 +12,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -35,7 +28,7 @@ import java.util.List;
 import garbagemayor.bigenews.newssrc.PagePlus;
 import garbagemayor.bigenews.newssrc.PageItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     //调试Log的标记
     private static final String TAG = "MainActivityTag";
@@ -238,7 +231,28 @@ public class MainActivity extends AppCompatActivity {
         mNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mPageItemRecView.setLayoutManager(mNewsLayoutManager);
         mNewsAdapter = new NewsAdapter(mNewsList);
+        mNewsAdapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int postion) {
+                //点击第postion条新闻
+                PageItem pageItem = mNewsList.get(postion);
+                if(pageItem != null){
+                    Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        mNewsAdapter.setOnItemLongClickListener(new NewsAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int postion) {
+                //长按第postion条新闻
+                PageItem pageItem = mNewsList.get(postion);
+                if(pageItem != null){
+                    Toast.makeText(MainActivity.this, "长按：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         mPageItemRecView.setAdapter(mNewsAdapter);
+
 
         //靠近底部自动加载功能
         mPageItemRecView.addOnScrollListener(new RecyclerView.OnScrollListener() {
