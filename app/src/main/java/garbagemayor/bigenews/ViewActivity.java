@@ -3,7 +3,6 @@ package garbagemayor.bigenews;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -19,7 +18,7 @@ public class ViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view);
+        setContentView(R.layout.news_detail_activity_layout);
 
         TextView TitleView = (TextView) findViewById(R.id.news_view_title);
         TextView ContentView = (TextView) findViewById(R.id.news_view_content);
