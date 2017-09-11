@@ -1,15 +1,21 @@
 package garbagemayor.bigenews.newssrc;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PageItem {
+    public static String TAG = "PageItemTag";
+
     private String newsClassTag;            //<!--新闻所属的分类-->
     private String news_ID;                  //<!-- 新闻id-->
     private String news_Source;             //<!-- 新闻来源 -->
@@ -22,31 +28,6 @@ public class PageItem {
     private String news_Video;
     private String news_Intro;             //<!-- 简介 -->
 
-
-    public String getId() {
-        return news_ID;
-    }
-    public String getClassTag() {
-        return newsClassTag;
-    }
-    public String getSource() {
-        return news_Source;
-    }
-    public String getAuthor() {
-        return news_Author;
-    }
-    public String getTitle() {
-        return news_Title;
-    }
-    public String getTime() {
-        return news_Time;
-    }
-    public String getIntro() {
-        return news_Intro;
-    }
-    public String getPictures() {return news_Pictures; }
-
-
     public String print() {
         return "newsClassTag; " + newsClassTag + "\n" +
                 "Source: " + news_Source + "\n" +
@@ -54,38 +35,84 @@ public class PageItem {
                 "Time: " + news_Time+ "\n" +
                 "ID: " + news_ID + "\n";
     }
+    public String getId() {
+        return news_ID;
+    }
+    public String getClassTag() {
+        return newsClassTag;
+    }
+    public String getSource() {
+        news_Source = prefixTrim(news_Source);
+        return news_Source;
+    }
+    public String getAuthor() {
+        news_Author = prefixTrim(news_Author);
+        return news_Author;
+    }
+    public String getTitle() {
+        news_Title = prefixTrim(news_Title);
+        return news_Title;
+    }
+    public String getTime() {
+        int year = Integer.parseInt(news_Time.substring(0, 4));
+        int month = Integer.parseInt(news_Time.substring(4, 6));
+        int day = Integer.parseInt(news_Time.substring(6, 8));
+        return year + "年" + month + "月" + day + "日";
+    }
+    public String getIntro() {
+        news_Intro = prefixTrim(news_Intro);
+        return news_Intro;
+    }
 
-    public NewsItem getNewsItem() {
-        NewsItem d=new NewsItem();
-        String result = "";
-        BufferedReader in = null;
-        String urlNameString = String.format("http://166.111.68.66:2042/news/action/query/detail?newsId=" + news_ID);
-        try {
-            URL realUrl = new URL(urlNameString);
-            URLConnection connection = realUrl.openConnection();
-            connection.connect();
-            in = new BufferedReader(new InputStreamReader(
-                    connection.getInputStream()));
-            String line;
-            while ((line = in.readLine()) != null) {
-                result += line;
+    public List<Bitmap> getImageList() {
+        List<Bitmap> bmpList = new ArrayList<Bitmap>();
+        String[] bmpUrlStrList = news_Pictures.split(";| |\n|\t|\r");
+        for (String bmpUrlStr: bmpUrlStrList) {
+            Bitmap bitmap = getBitmapFromUrl(bmpUrlStr);
+            if (bitmap != null) {
+                Log.d(TAG, "加载图片成功，URL=" + bmpUrlStr);
+                bmpList.add(bitmap);
             }
-        } catch (Exception e) {
-            System.out.println("无网络连接" + e);
+        }
+        return bmpList;
+    }
+
+    public List<String> getImageUrlList() {
+        List<String> urlList = new ArrayList<>();
+        String[] urlArray = news_Pictures.split(";| |\n|\t|\r");
+        for(String url: urlArray) {
+            urlList.add(url);
+        }
+        return urlList;
+    }
+
+    private static String prefixTrim(String str) {
+        str = str.replaceAll("　","  ");
+        str = str.replaceAll("\t","  ");
+        for (int i = 0; i < str.length(); i++) {
+            if(str.charAt(i) != ' ') {
+                str =  str.substring(i, str.length());
+                break;
+            }
+        }
+        return str;
+    }
+
+    private static Bitmap getBitmapFromUrl(String urlStr) {
+        Bitmap bitmap = null;
+        try {
+            URL imgUrl = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) imgUrl.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+            InputStream is = conn.getInputStream();
+            bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-        Gson gson = new GsonBuilder().create();
-        d = gson.fromJson(result, NewsItem.class);
-        //System.out.println(d.getPageItem());
-        return d;
+        return bitmap;
     }
 }

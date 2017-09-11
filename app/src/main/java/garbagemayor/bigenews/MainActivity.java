@@ -56,10 +56,9 @@ public class MainActivity extends AppCompatActivity{
     private boolean isLoading = false;
     private PagePlus mPage;
     private int mPageId;
-    private static int mPageSize = 20;
+    private static int mPageSize = 10;
     //连按两次“退出”按钮才退出
     private Date lastPressQuit = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -317,9 +316,11 @@ public class MainActivity extends AppCompatActivity{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for(PageItem pageItem: mPage.cont) {
-            mNewsList.add(pageItem);
-            mNewsAdapter.notifyItemInserted(mNewsList.size());
+        if(mPage.cont != null) {
+            for (PageItem pageItem : mPage.cont) {
+                mNewsList.add(pageItem);
+                mNewsAdapter.notifyItemInserted(mNewsList.size());
+            }
         }
         isLoading = false;
     }
