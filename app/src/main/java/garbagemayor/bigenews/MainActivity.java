@@ -1,5 +1,7 @@
 package garbagemayor.bigenews;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,8 +14,18 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,36 +37,47 @@ import garbagemayor.bigenews.newssrc.PageItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    //调试Log的标记
     private static final String TAG = "MainActivityTag";
-
+    //侧滑菜单布局
     private DrawerLayout mDrawerLayout;
-    private RecyclerView mRecyclerView;
-    private StaggeredGridLayoutManager mLayoutManager;
+    //筛选器部分
+    private int nowCategoryId = 0;
+    //类别筛选
+    private Button mCategoryBtn;
+    private GridView mCategoryGridView;
+    private StaggeredGridLayoutManager mCategoryLayoutManager;
+    //private CategoryAdapter mCategoryAdapter;
+    private ArrayAdapter<String> mCategoryAdapter;
+    private List<String> mCategoryList;
+    private PopupWindow mCategoryPopupWindow;
+    //新闻浏览部分
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView mPageItemRecView;
+    private StaggeredGridLayoutManager mNewsLayoutManager;
+    private NewsAdapter mNewsAdapter;
+    private static int visibleThreshold = 5;
+    private List<PageItem> mNewsList = new ArrayList<>();
+    //新闻加载器部分
+    private boolean isLoading = false;
     private PagePlus mPage;
     private int mPageId;
     private static int mPageSize = 20;
-
-    //上次点击“退出”按钮的时间
+    //连按两次“退出”按钮才退出
     private Date lastPressQuit = null;
-    private boolean isLoading = false;
-    private int visibleThreshold = 5;
-
-    //新闻内容
-    private List<PageItem> mNewsList = new ArrayList<>();
-    private NewsAdapter mAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
-        Log.e(TAG, "Main::onCreate()");
 
         //用ToolBar代替ActionBar
         initToolBar();
         //侧滑菜单里的按钮的行为
         initNavigationView();
+        //筛选器里按钮的行为
+        initNewsFilter();
         //新闻模块的显示，下拉刷新，自动加载的功能
         initShowNews();
         //第一页新闻
@@ -160,24 +183,72 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //筛选器里面的按钮的行为
+    private void initNewsFilter() {
+        //“类别”按钮的内容
+        mCategoryList = new ArrayList<>();
+        mCategoryList.add("最新");
+        mCategoryList.add("科技");
+        mCategoryList.add("教育");
+        mCategoryList.add("军事");
+        mCategoryList.add("国内");
+        mCategoryList.add("社会");
+        mCategoryList.add("文化");
+        mCategoryList.add("汽车");
+        mCategoryList.add("国际");
+        mCategoryList.add("体育");
+        mCategoryList.add("财经");
+        mCategoryList.add("健康");
+        mCategoryList.add("娱乐");
+        //设置弹出窗口的属性
+        View contentView = MainActivity.this.getLayoutInflater().inflate(R.layout.filter_category_layout, null);
+        mCategoryPopupWindow = new PopupWindow(contentView, GridView.LayoutParams.WRAP_CONTENT, GridView.LayoutParams.WRAP_CONTENT, true);
+        mCategoryPopupWindow.setContentView(contentView);
+        mCategoryPopupWindow.setAnimationStyle(R.style.FilterTranslateAnimation);
+        //设置内容适配器
+        mCategoryGridView = (GridView) contentView.findViewById(R.id.category_list);
+        mCategoryAdapter = new ArrayAdapter<String>(MainActivity.this, R.layout.category_item_layout, mCategoryList);
+        mCategoryGridView.setAdapter(mCategoryAdapter);
+        mCategoryGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(nowCategoryId != i) {
+                    nowCategoryId = i;
+                    mCategoryBtn.setText("分类：" + mCategoryList.get(i));
+                    refreshNews();
+                }
+                mCategoryPopupWindow.dismiss();
+            }
+        });
+        //设置“类别”按钮行为
+        mCategoryBtn = (Button) findViewById(R.id.main_filter_category);
+        mCategoryBtn.setText("分类：" + "最新");
+        mCategoryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCategoryPopupWindow.showAsDropDown(mCategoryBtn);
+            }
+        });
+    }
+
     //新闻显示模块
     private void initShowNews() {
         //RecyclerView里面初始化
-        mRecyclerView = (RecyclerView) findViewById(R.id.main_news_list);
-        mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new NewsAdapter(mNewsList);
-        mRecyclerView.setAdapter(mAdapter);
+        mPageItemRecView = (RecyclerView) findViewById(R.id.main_news_list);
+        mNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        mPageItemRecView.setLayoutManager(mNewsLayoutManager);
+        mNewsAdapter = new NewsAdapter(mNewsList);
+        mPageItemRecView.setAdapter(mNewsAdapter);
 
         //靠近底部自动加载功能
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mPageItemRecView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if(isLoading)
                     return;
-                int itemCount = mLayoutManager.getItemCount();
-                int[] lastPosList = mLayoutManager.findLastVisibleItemPositions(null);
+                int itemCount = mNewsLayoutManager.getItemCount();
+                int[] lastPosList = mNewsLayoutManager.findLastVisibleItemPositions(null);
                 int lastPos = Integer.MIN_VALUE;
                 for(int i = 0; i < lastPosList.length; i ++) {
                     if(lastPos < lastPosList[i]) {
@@ -199,27 +270,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    /*
-    //预处理新闻显示模块
-    private void initNewsSrc() {
-        Log.d(TAG, "initNewsSrc start");
-        mPageId = 1;
-        mPageSize = 20;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "initNewsSrc new Thread");
-                mPage = new PagePlus(mPageId, mPageSize);
-            }
-        }).start();
-        Log.d(TAG, "initNewsSrc finish");
-    }
-    */
     //刷新，得到第一页新闻
     private void refreshNews() {
         mSwipeRefreshLayout.setRefreshing(true);
         mNewsList.clear();
-        mAdapter.notifyDataSetChanged();
+        mNewsAdapter.notifyDataSetChanged();
         mPageId = 0;
         loadAPageOfNewNews();
         mSwipeRefreshLayout.setRefreshing(false);
@@ -227,12 +282,15 @@ public class MainActivity extends AppCompatActivity {
     //向RecyclerView里加入新的新闻
     private void loadAPageOfNewNews() {
         isLoading = true;
-        Log.d(TAG,"loadAPageOfNewNews");
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                mPage = new PagePlus(++mPageId, mPageSize);
-                Log.d(TAG,"loadAPageOfNewNews Thread finish");
+                if(nowCategoryId == 0) {
+                    mPage = new PagePlus(++mPageId, mPageSize);
+                }
+                else {
+                    mPage = new PagePlus(nowCategoryId, ++mPageId, mPageSize);
+                }
             }
         });
         t.start();
@@ -241,10 +299,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.d(TAG,"loadAPageOfNewNews main finish");
         for(PageItem pageItem: mPage.cont) {
             mNewsList.add(pageItem);
-            mAdapter.notifyItemInserted(mNewsList.size());
+            mNewsAdapter.notifyItemInserted(mNewsList.size());
         }
         isLoading = false;
     }
@@ -254,10 +311,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRecyclerView.scrollToPosition(0);
+                mPageItemRecView.scrollToPosition(0);
             }
         });
-
     }
 }
 

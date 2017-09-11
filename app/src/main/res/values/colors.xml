@@ -3,4 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="main_filter_text_color_off">#CFCFCF</color>
+    <color name="main_newscard_title">#000080</color>
+    <color name="main_newscard_time">#9F9F9F</color>
+    <color name="popup_window_background_color">#DF303F9F</color>
 </resources>

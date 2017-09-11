@@ -36,7 +36,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 super.handleMessage(msg);
             }
         };
-        mHandler.sendEmptyMessageDelayed(0,2000);
+        mHandler.sendEmptyMessageDelayed(0,500);
     }
 
     public void getHome(){

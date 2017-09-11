@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 侧滑菜单，内嵌的两个部分，第一部分是主界面，第二部分是菜单 -->
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,21 +9,24 @@
     android:layout_height="match_parent"
     tools:context="garbagemayor.bigenews.MainActivity">
 
+    <!-- 主界面，用CoordinatorLayout可以在上下滑动的时候自动隐藏Toolbar -->
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- 为什么要给Toolbar外面包一层？忘了，反正网上都这么写的 -->
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- 最后两个app:xxx的属性，是为了接收外层CoordinatorLayout传来的滚动状态 -->
             <android.support.v7.widget.Toolbar
                 android:id="@+id/main_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="@color/colorPrimary"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:layout_scrollFlags="scroll|enterAlways|snap">
@@ -30,20 +34,52 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/main_swipe_refresh"
+        <!-- 筛选器和新闻浏览，他们共同属于一个上下关系的相对布局，app:xxx的属性是为了把滚动状态向外传给是为了接收外层CoordinatorLayout传来的滚动状态 -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/main_news_list"
+            <!-- 多重筛选，横向的相对布局，依次是“类别”、“时间”、“搜索关键字” -->
+            <RelativeLayout
+                android:id="@+id/main_filter"
+                android:layout_alignParentTop="true"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary">
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+                <!-- 类别筛选，点击开关可以打开一个 -->
+                <Button
+                    android:id="@+id/main_filter_category"
+                    android:layout_alignParentLeft="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/category"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    android:background="@color/colorPrimaryDark"
+                    />
 
+            </RelativeLayout>
+
+            <!-- 新闻浏览部分，下拉刷新要给RecyclerView套一个SwipeRefreshLayout在外面，而RecyclerView里面每条新闻的模式在另一个xml里 -->
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/main_swipe_refresh"
+                android:layout_below="@id/main_filter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/main_news_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </RelativeLayout>
+
+        <!-- 一个悬浮按钮，回到顶部，说不定还可以放一大串按钮 -->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/main_floating"
             android:layout_width="wrap_content"
@@ -59,6 +95,7 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
+    <!-- 侧滑菜单里面的东西 -->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="match_parent"
