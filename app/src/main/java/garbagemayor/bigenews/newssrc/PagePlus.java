@@ -69,7 +69,7 @@ public class PagePlus {
     public static NewsItem getNewsItem(String id) {
         NewsItem d = new NewsItem();
         String result = "";
-        Log.d("ViewActivityTag", "result"+ result);
+        //Log.d("ViewActivityTag", "result"+ result);
         BufferedReader in = null;
         String urlNameString = "http://166.111.68.66:2042/news/action/query/detail?newsId=" + id;
         try {
@@ -83,7 +83,7 @@ public class PagePlus {
                 result += line;
             }
         } catch (Exception e) {
-            Log.d("ViewActivityTag", "无网络连接" + e);
+            //Log.d("ViewActivityTag", "无网络连接" + e);
             e.printStackTrace();
         }
         finally {
@@ -95,7 +95,7 @@ public class PagePlus {
                 e2.printStackTrace();
             }
         }
-        Log.d("ViewActivityTag", result);
+        //Log.d("ViewActivityTag", result);
         Gson gson = new GsonBuilder().create();
         d = gson.fromJson(result, NewsItem.class);
         //System.out.println(d.getPageItem());

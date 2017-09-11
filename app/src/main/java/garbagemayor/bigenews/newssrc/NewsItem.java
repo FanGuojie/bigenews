@@ -7,6 +7,7 @@ public class NewsItem {
     private String news_Content;        //<!-- 新闻正文 -->
     private String news_Journal;        //<!--记者列表-->
     private String news_Title;
+    private String news_Pictures;
 
     public String getTitle() {
         return news_Title;
@@ -23,6 +24,7 @@ public class NewsItem {
     public String getJournal() {
         return news_Journal;
     }
+    public String getPictures() {return news_Pictures; }
 
 
 }
