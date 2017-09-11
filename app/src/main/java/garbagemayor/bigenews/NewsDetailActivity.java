@@ -25,6 +25,9 @@ import java.util.ArrayList;
 
 public class NewsDetailActivity extends AppCompatActivity
     implements ObservableScrollViewCallbacks {
+
+    MyCallBack callback;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,9 +35,14 @@ public class NewsDetailActivity extends AppCompatActivity
         Intent intent = getIntent();
         String news_id = intent.getStringExtra("id");
 
-        NewsDetail news = MainActivity.pageProvider.getNewsDetail(news_id);
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(news.getNews_Content());
+        callback = new MyCallBack() {
+            @Override
+            public void callbackCall() {
+                TextView textView = (TextView) findViewById(R.id.textView);
+                textView.setText(MainActivity.pageProvider.getNewsDetail().getNews_Content());
+            }
+        };
+        MainActivity.pageProvider.loadNewsDetail(news_id, callback);
 //        ObservableListView listView = (ObservableListView) findViewById(R.id.viewPager);
 //        ObservableListView listView = (ObservableListView) findViewById(R.id.listView);
 //        listView.setScrollViewCallbacks(this);

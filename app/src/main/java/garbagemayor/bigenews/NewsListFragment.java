@@ -2,7 +2,6 @@ package garbagemayor.bigenews;
 
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,25 +11,26 @@ import android.view.ViewGroup;
 
 import com.wuxiaolong.pullloadmorerecyclerview.PullLoadMoreRecyclerView;
 
-import java.util.List;
+public class NewsListFragment extends Fragment implements PullLoadMoreRecyclerView.PullLoadMoreListener {
 
-public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.PullLoadMoreListener {
-
+    protected View rootView;
     private PullLoadMoreRecyclerView mPullLoadMoreRecyclerView;
-    private int mCount = 1;
-    private RecyclerViewAdapter mRecyclerViewAdapter;
+    private int category = 1;
+    private int mCount = 4;
+    private NewsListViewAdapter mNewsListViewAdapter;
     private RecyclerView mRecyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_frist, container, false);
+        category = getArguments().getInt("category");
+        return inflater.inflate(R.layout.fragment_newslist, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPullLoadMoreRecyclerView = (PullLoadMoreRecyclerView) view.findViewById(R.id.pullLoadMoreRecyclerView);
+        mPullLoadMoreRecyclerView = view.findViewById(R.id.pullLoadMoreRecyclerView);
         //获取mRecyclerView对象
         mRecyclerView = mPullLoadMoreRecyclerView.getRecyclerView();
         //代码设置scrollbar无效？未解决！
@@ -38,7 +38,7 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
         //设置下拉刷新是否可见
         //mPullLoadMoreRecyclerView.setRefreshing(true);
         //设置是否可以下拉刷新
-        //mPullLoadMoreRecyclerView.setPullRefreshEnable(true);
+        mPullLoadMoreRecyclerView.setPullRefreshEnable(true);
         //设置是否可以上拉刷新
         //mPullLoadMoreRecyclerView.setPushRefreshEnable(false);
         //显示下拉刷新
@@ -52,46 +52,23 @@ public class FirstFragment extends Fragment implements PullLoadMoreRecyclerView.
         mPullLoadMoreRecyclerView.setLinearLayout();
 
         mPullLoadMoreRecyclerView.setOnPullLoadMoreListener(this);
-        mRecyclerViewAdapter = new RecyclerViewAdapter(getActivity());
-        mPullLoadMoreRecyclerView.setAdapter(mRecyclerViewAdapter);
-        getData();
-
-    }
-
-    private void getData() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecyclerViewAdapter.addAllData(MainActivity.pageProvider.getNewsList(1, 20));
-                        mPullLoadMoreRecyclerView.setPullLoadMoreCompleted();
-                    }
-                });
-
-            }
-        }, 1000);
-
-    }
-
-    private void setRefresh() {
-        mRecyclerViewAdapter.clearData();
-        mCount = 1;
+        mNewsListViewAdapter = new NewsListViewAdapter(getActivity());
+        mPullLoadMoreRecyclerView.setAdapter(mNewsListViewAdapter);
+        mNewsListViewAdapter.addData(this.category);
     }
 
     @Override
     public void onRefresh() {
         Log.e("rv", "onRefresh");
-        setRefresh();
-        getData();
+        mCount = 4;
+        mNewsListViewAdapter.clearData();
+        mNewsListViewAdapter.addData(this.category);
     }
 
     @Override
     public void onLoadMore() {
         Log.e("rv", "onLoadMore");
-        mCount = mCount + 1;
-        getData();
+        mNewsListViewAdapter.addData(this.category);
     }
 
 }

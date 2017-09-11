@@ -2,4 +2,5 @@
     <string name="app_name">Bige News</string>
     <string name="edit_search">Edit Search</string>
     <string name="button_send">Button Send</string>
+    <string name="category_china">china</string>
 </resources>

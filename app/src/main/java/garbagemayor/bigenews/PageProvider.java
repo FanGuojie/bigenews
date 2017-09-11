@@ -1,6 +1,7 @@
 package garbagemayor.bigenews;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -23,20 +24,51 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class PageProvider {
-    String API_BASE_URL = "http://166.111.68.66:2042/news/action/query/";
-    NewsAPI api;
-    private static List<NewsList.ListBean> newsList = new ArrayList<>();
-    private static NewsDetail newsDetail = new NewsDetail();
+import static android.content.ContentValues.TAG;
 
-    public List<NewsList.ListBean> getNewsList(int category, int count) {
-        loadNewsList(1, count);
+public class PageProvider {
+
+
+    String API_BASE_URL = "http://166.111.68.66:2042/news/action/query/";
+    private static NewsList newsList = new NewsList();
+    private static NewsDetail newsDetail = new NewsDetail();
+    NewsAPI api;
+    NewsList getNewsList() {
         return newsList;
     }
-
-    public NewsDetail getNewsDetail(String id) {
-        loadNewsDetail(id);
+    NewsDetail getNewsDetail() {
         return newsDetail;
+    }
+
+    void loadNewsList(String keyword, int category, int no, int size, final MyCallBack callback) {
+        Call<NewsList> call = api.search(keyword, category, no, size);
+        asynLoad(call ,callback);
+    }
+
+    void loadNewsList(int category, int no, int size, final MyCallBack callback) {
+        Call<NewsList> call = api.category(category, no, size);
+        asynLoad(call, callback);
+    }
+
+    void loadNewsList(int no, int size, final MyCallBack callback) {
+        Call<NewsList> call = api.latest(no, size);
+        asynLoad(call, callback);
+    }
+
+    void loadNewsDetail(String id, final MyCallBack callback) {
+        Call<NewsDetail> call = api.detail(id);
+        call.enqueue(new Callback<NewsDetail>() {
+            @Override
+            public void onResponse(Call<NewsDetail> call, Response<NewsDetail> response) {
+                newsDetail = response.body();
+                callback.callbackCall();
+            }
+
+            @Override
+            public void onFailure(Call<NewsDetail> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     PageProvider() {
@@ -59,46 +91,17 @@ public class PageProvider {
         api = retrofit.create(NewsAPI.class);
     }
 
-
-    void loadNewsList(int no, int size) {
-        Call<NewsList> call = api.latest(no, size);
-//        try {
-//            newsList = call.execute().body().getList();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    void asynLoad(Call call, final MyCallBack callback) {
+        // asynchronous
         call.enqueue(new Callback<NewsList>() {
             @Override
             public void onResponse(Call<NewsList> call, Response<NewsList> response) {
-                newsList = response.body().getList();
+                newsList = response.body();
+                callback.callbackCall();
             }
 
             @Override
             public void onFailure(Call<NewsList> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-    }
-
-
-    void loadNewsDetail(String id) {
-        Call<NewsDetail> call = api.detail(id);
-        // load details for certain news id
-//        try {
-//            newsDetail = call.execute().body();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        call.enqueue(new Callback<NewsDetail>() {
-            @Override
-            public void onResponse(Call<NewsDetail> call, Response<NewsDetail> response) {
-                // The network call was a success and we got a response
-                newsDetail = response.body();
-            }
-
-            @Override
-            public void onFailure(Call<NewsDetail> call, Throwable t) {
-                // the network call was a failure
                 t.printStackTrace();
             }
         });
