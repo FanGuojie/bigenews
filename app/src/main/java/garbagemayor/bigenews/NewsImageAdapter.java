@@ -50,6 +50,10 @@ public class NewsImageAdapter extends RecyclerView.Adapter<NewsImageAdapter.View
             view.setOnLongClickListener(this);
         }
 
+        public ImageView getImageView() {
+            return mImageView;
+        }
+
         @Override
         public void onClick(View view) {
             if(mListener != null){

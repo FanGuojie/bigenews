@@ -12,7 +12,7 @@
         <item name="android:windowExitAnimation">@anim/filter_popup_out</item>
     </style>
     <style name="BigPictureTranslateAnimation">
-        <item name="android:windowEnterAnimation">@anim/big_picture_popup_in</item>
+        <!--<item name="android:windowEnterAnimation">@anim/big_picture_popup_in</item>-->
         <item name="android:windowExitAnimation">@anim/big_picture_popup_out</item>
     </style>
 

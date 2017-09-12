@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -37,10 +38,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     private ViewHolder mViewHolder;
     private LinearLayoutManager  mNewsImageLayoutManager;
     private NewsImageAdapter mNewsImageAdapter;
-    private List<List<String>> mImageUrlListList;
-
-    private PopupWindow mViewBigPicturePopupWindow;
-    private PhotoView mViewBigPicturePhotoView;
+    private BigPicturePopupWindow mBigPicture;
 
     private OnItemClickListener mItemClickListener;
     private OnItemLongClickListener mItemLongClickListener;
@@ -93,7 +91,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     public NewsAdapter(List<PageItem> newsList) {
         mNewsList = newsList;
-        mImageUrlListList = new ArrayList<>();
+
     }
 
     @Override
@@ -112,55 +110,19 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         mNewsImageLayoutManager = new LinearLayoutManager(mContext);
         mNewsImageLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         holder.mImageListRecView.setLayoutManager(mNewsImageLayoutManager);
-        List<String> imageUrlList = pageItem.getImageUrlList();
-        mImageUrlListList.add(imageUrlList);
-        mNewsImageAdapter = new NewsImageAdapter(imageUrlList);
-        initBitPicture(holder, position);
-        holder.mImageListRecView.setAdapter(mNewsImageAdapter);
-    }
-
-    private void initBitPicture(ViewHolder holder, final int position) {
-        //设置点击图片查看大图的popupWindow的属性
-        Log.d(TAG, "设置点击图片查看大图的popupWindow的属性");
-        View contentView = LayoutInflater.from(mContext).inflate(R.layout.view_big_picture_layout, null);
-        mViewBigPicturePopupWindow = new PopupWindow(contentView, GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT, true);
-        mViewBigPicturePopupWindow.setContentView(contentView);
-        mViewBigPicturePopupWindow.setBackgroundDrawable(new ColorDrawable(0xDF000000));
-        mViewBigPicturePopupWindow.setAnimationStyle(R.style.BigPictureTranslateAnimation);
-        //设置大图PhotoView的特性
-        Log.d(TAG, "设置大图PhotoView的特性");
-        mViewBigPicturePhotoView = (PhotoView) contentView.findViewById(R.id.view_big_picture);
-        mViewBigPicturePhotoView.enable();
-        //设置小图点击事件：查看大图
+        //设置小图列表的各种事件
+        mNewsImageAdapter = new NewsImageAdapter(pageItem.getImageUrlList());
+        if(mBigPicture == null) {
+            mBigPicture = new BigPicturePopupWindow(mContext, mViewHolder.mCardView);
+        }
+        //小图点击事件：查看大图
         mNewsImageAdapter.setOnItemClickListener(new NewsImageAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int innerPosition) {
-                String imgUrl = mImageUrlListList.get(position).get(innerPosition);
-                AsynImageLoader.getnstance().showImageAsyn(mViewBigPicturePhotoView, imgUrl, R.mipmap.welcome);
-                mViewBigPicturePopupWindow.showAtLocation(mViewHolder.mCardView, Gravity.CENTER, 0, 0);
+                mBigPicture.show((ImageView) ((LinearLayout) view).getChildAt(0));
             }
         });
-        //设置打开大图之后的点击事件：关闭大图
-        mViewBigPicturePhotoView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mViewBigPicturePopupWindow.dismiss();
-            }
-        });
-        //设置打开大图之后的长按事件：存图
-        mViewBigPicturePhotoView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                Random random = new Random();
-                String fileName = "";
-                for (int i = 0; i < 16; i ++) {
-                    fileName = fileName + random.nextInt(10);
-                }
-                fileName = fileName + ".png";
-                Toast.makeText(mContext, "图片以保存到" + "sdcard/BigeNews/Download/image/" + fileName, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
+        holder.mImageListRecView.setAdapter(mNewsImageAdapter);
     }
 
     @Override
