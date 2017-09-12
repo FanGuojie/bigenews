@@ -35,10 +35,12 @@
         </android.support.design.widget.AppBarLayout>
 
         <!-- 筛选器和新闻浏览，他们共同属于一个上下关系的相对布局，app:xxx的属性是为了把滚动状态向外传给是为了接收外层CoordinatorLayout传来的滚动状态 -->
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            >
 
             <!-- 多重筛选，横向的相对布局，依次是“类别”、“时间”、“搜索关键字” -->
             <LinearLayout
@@ -59,13 +61,12 @@
                     android:textColor="@android:color/white"
                     android:background="@color/colorPrimaryDark"
                     />
-                <Button
+                <android.support.v7.widget.SearchView
                     android:id="@+id/main_filter_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="搜索"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
+                    android:queryHint="@string/wait_for_input"
+                    android:focusable="true"
                     android:background="@color/colorPrimaryDark"
                     />
 
@@ -87,7 +88,7 @@
 
             </android.support.v4.widget.SwipeRefreshLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <!-- 一个悬浮按钮，回到顶部，说不定还可以放一大串按钮 -->
         <android.support.design.widget.FloatingActionButton

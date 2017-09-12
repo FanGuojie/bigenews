@@ -54,10 +54,15 @@ public class PageItem {
         return news_Title;
     }
     public String getTime() {
-        int year = Integer.parseInt(news_Time.substring(0, 4));
-        int month = Integer.parseInt(news_Time.substring(4, 6));
-        int day = Integer.parseInt(news_Time.substring(6, 8));
-        return year + "年" + month + "月" + day + "日";
+        try {
+            int year = Integer.parseInt(news_Time.substring(0, 4));
+            int month = Integer.parseInt(news_Time.substring(4, 6));
+            int day = Integer.parseInt(news_Time.substring(6, 8));
+            return year + "年" + month + "月" + day + "日";
+        } catch (Exception e) {
+            Log.d(TAG, "news_Time = " + news_Time);
+            return "未知时间" + news_Time;
+        }
     }
     public String getIntro() {
         news_Intro = prefixTrim(news_Intro);

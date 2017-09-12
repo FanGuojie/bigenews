@@ -1,6 +1,9 @@
 package garbagemayor.bigenews;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,17 +13,22 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +37,7 @@ import java.util.List;
 import garbagemayor.bigenews.newssrc.PagePlus;
 import garbagemayor.bigenews.newssrc.PageItem;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     //调试Log的标记
     private static final String TAG = "MainActivityTag";
@@ -37,6 +45,7 @@ public class MainActivity extends AppCompatActivity{
     private DrawerLayout mDrawerLayout;
     //筛选器部分
     private int nowCategoryId = 0;
+    private String nowSearchText = "";
     //类别筛选
     private Button mCategoryBtn;
     private GridView mCategoryGridView;
@@ -45,6 +54,8 @@ public class MainActivity extends AppCompatActivity{
     private ArrayAdapter<String> mCategoryAdapter;
     private List<String> mCategoryList;
     private PopupWindow mCategoryPopupWindow;
+    //搜索模块
+    private SearchView mSearchView;
     //新闻浏览部分
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mPageItemRecView;
@@ -91,6 +102,7 @@ public class MainActivity extends AppCompatActivity{
             actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer_home);
         }
     }
+
     //显示侧滑菜单
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -103,10 +115,11 @@ public class MainActivity extends AppCompatActivity{
         }
         return true;
     }
+
     //侧滑菜单里的按钮的行为
     private void initNavigationView() {
 
-        NavigationView navView = (NavigationView)findViewById(R.id.nav_view);
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setCheckedItem(R.id.nav_homepage);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -141,7 +154,8 @@ public class MainActivity extends AppCompatActivity{
                         mDrawerLayout.closeDrawers();
                         break;
                     //连按两次退出程序
-                    case R.id.nav_quit:pressQuit();
+                    case R.id.nav_quit:
+                        pressQuit();
                         break;
                     default:
                 }
@@ -205,7 +219,7 @@ public class MainActivity extends AppCompatActivity{
         mCategoryGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(nowCategoryId != i) {
+                if (nowCategoryId != i) {
                     nowCategoryId = i;
                     mCategoryBtn.setText("分类：" + mCategoryList.get(i));
                     refreshNews();
@@ -222,6 +236,57 @@ public class MainActivity extends AppCompatActivity{
                 mCategoryPopupWindow.showAsDropDown(mCategoryBtn);
             }
         });
+        //设置搜索模块行为
+        mSearchView = (SearchView) findViewById(R.id.main_filter_search);
+        mSearchView.setFocusable(true);
+        mSearchView.setIconifiedByDefault(true);
+        mSearchView.setSubmitButtonEnabled(true);
+        mSearchView.onActionViewExpanded();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String queryText) {
+                //Toast.makeText(MainActivity.this, "搜索：" + queryText, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onQueryTextSubmit");
+                nowSearchText = queryText;
+                refreshNews();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String text) {
+                Log.d(TAG, "onQueryTextChange");
+                nowSearchText = text;
+                return true;
+            }
+        });
+        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d(TAG, "onClose");
+                nowSearchText = "";
+                return false;
+            }
+        });
+        mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onSearchClick");
+                InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm.isActive()) {
+                    imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+                }
+            }
+        });
+        mSearchView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                Log.d(TAG, "onSearchClick");
+                InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm.isActive()) {
+                    imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
+                }
+            }
+        });
     }
 
     //新闻显示模块
@@ -236,7 +301,7 @@ public class MainActivity extends AppCompatActivity{
             public void onItemClick(View view, int postion) {
                 //点击第postion条新闻
                 PageItem pageItem = mNewsList.get(postion);
-                if(pageItem != null){
+                if (pageItem != null) {
                     Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
@@ -250,7 +315,7 @@ public class MainActivity extends AppCompatActivity{
             public void onItemLongClick(View view, int postion) {
                 //长按第postion条新闻
                 PageItem pageItem = mNewsList.get(postion);
-                if(pageItem != null){
+                if (pageItem != null) {
                     Toast.makeText(MainActivity.this, "长按：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -263,17 +328,17 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if(isLoading)
+                if (isLoading)
                     return;
                 int itemCount = mNewsLayoutManager.getItemCount();
                 int[] lastPosList = mNewsLayoutManager.findLastVisibleItemPositions(null);
                 int lastPos = Integer.MIN_VALUE;
-                for(int i = 0; i < lastPosList.length; i ++) {
-                    if(lastPos < lastPosList[i]) {
+                for (int i = 0; i < lastPosList.length; i++) {
+                    if (lastPos < lastPosList[i]) {
                         lastPos = lastPosList[i];
                     }
                 }
-                if(lastPos >= (itemCount - visibleThreshold)) {
+                if (lastPos >= (itemCount - visibleThreshold)) {
                     loadAPageOfNewNews();
                 }
             }
@@ -288,6 +353,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
+
     //刷新，得到第一页新闻
     private void refreshNews() {
         mSwipeRefreshLayout.setRefreshing(true);
@@ -297,17 +363,26 @@ public class MainActivity extends AppCompatActivity{
         loadAPageOfNewNews();
         mSwipeRefreshLayout.setRefreshing(false);
     }
+
     //向RecyclerView里加入新的新闻
     private void loadAPageOfNewNews() {
         isLoading = true;
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                if(nowCategoryId == 0) {
-                    mPage = new PagePlus(++mPageId, mPageSize);
-                }
-                else {
-                    mPage = new PagePlus(nowCategoryId, ++mPageId, mPageSize);
+                Log.d(TAG, "loadAPageOfNewNews.run()  nowCategoryId = " + nowCategoryId + " nowSearchText = " + nowSearchText);
+                if (nowCategoryId == 0) {
+                    if (nowSearchText.equals("")) {
+                        mPage = new PagePlus(++mPageId, mPageSize);
+                    } else {
+                        mPage = new PagePlus(nowSearchText, ++mPageId, mPageSize);
+                    }
+                } else {
+                    if (nowSearchText.equals("")) {
+                        mPage = new PagePlus(nowCategoryId, ++mPageId, mPageSize);
+                    } else {
+                        mPage = new PagePlus(nowSearchText, nowCategoryId, ++mPageId, mPageSize);
+                    }
                 }
             }
         });
@@ -317,7 +392,7 @@ public class MainActivity extends AppCompatActivity{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(mPage.cont != null) {
+        if (mPage.cont != null) {
             for (PageItem pageItem : mPage.cont) {
                 mNewsList.add(pageItem);
                 mNewsAdapter.notifyItemInserted(mNewsList.size());
@@ -325,6 +400,7 @@ public class MainActivity extends AppCompatActivity{
         }
         isLoading = false;
     }
+
     //设置返回顶部的按钮
     private void initBackToTopButtom() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.main_floating);

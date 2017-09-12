@@ -25,6 +25,9 @@ public class PagePlus {
     public PagePlus(int category, int No, int Size){
         this(String.format("http://166.111.68.66:2042/news/action/query/latest?category=%d&pageNo=%d&pageSize=%d", category, No, Size));
     }
+    public PagePlus(String keyword, int No, int Size){
+        this(String.format("http://166.111.68.66:2042/news/action/query/search?keyword=%s&pageNo=%d&pageSize=%d", keyword, No, Size));
+    }
     public PagePlus(String keyword, int category, int No, int Size){
         this(String.format("http://166.111.68.66:2042/news/action/query/search?keyword=%s&category=%d&pageNo=%d&pageSize=%d", keyword, category, No, Size));
     }
