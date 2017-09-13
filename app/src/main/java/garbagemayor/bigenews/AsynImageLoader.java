@@ -133,13 +133,16 @@ public class AsynImageLoader {
         }
     };
 
-    private static Bitmap getBitmapFromUrl(String urlStr) {
+    public static Bitmap getBitmapFromUrl(String urlStr) {
+        if (instance.caches.containsKey(urlStr)) {
+            return instance.caches.get(urlStr).get();
+        }
         Bitmap bitmap = null;
         try {
             URL imgUrl = new URL(urlStr);
             HttpURLConnection conn = (HttpURLConnection) imgUrl.openConnection();
             conn.setDoInput(true);
-            conn.setConnectTimeout(2000);
+            conn.setConnectTimeout(5000);
             conn.connect();
             InputStream is = conn.getInputStream();
             bitmap = BitmapFactory.decodeStream(is);

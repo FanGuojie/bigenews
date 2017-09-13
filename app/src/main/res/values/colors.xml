@@ -7,4 +7,6 @@
     <color name="main_newscard_title">#000080</color>
     <color name="main_newscard_time">#9F9F9F</color>
     <color name="popup_window_background_color">#DF303F9F</color>
+    <color name="view_big_picture_background">#CF000000</color>
+    <color name="search_view_alive_backgound">#6C79D2</color>
 </resources>

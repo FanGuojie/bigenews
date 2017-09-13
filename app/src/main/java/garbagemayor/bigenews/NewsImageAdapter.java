@@ -29,11 +29,11 @@ public class NewsImageAdapter extends RecyclerView.Adapter<NewsImageAdapter.View
     private OnItemLongClickListener mItemLongClickListener;
 
     public static interface OnItemClickListener {
-        public void onItemClick(View view, int postion);
+        public void onItemClick(View view, int position);
     }
 
     public static interface OnItemLongClickListener {
-        public void onItemLongClick(View view, int postion);
+        public void onItemLongClick(View view, int position);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
@@ -48,6 +48,10 @@ public class NewsImageAdapter extends RecyclerView.Adapter<NewsImageAdapter.View
             this.mLongClickListener = longClickListener;
             view.setOnClickListener(this);
             view.setOnLongClickListener(this);
+        }
+
+        public ImageView getImageView() {
+            return mImageView;
         }
 
         @Override

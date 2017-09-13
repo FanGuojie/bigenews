@@ -1,17 +1,28 @@
 package garbagemayor.bigenews;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bm.library.PhotoView;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import garbagemayor.bigenews.newssrc.PageItem;
 
@@ -27,6 +38,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     private ViewHolder mViewHolder;
     private LinearLayoutManager  mNewsImageLayoutManager;
     private NewsImageAdapter mNewsImageAdapter;
+    private BigPicturePopupWindow mBigPicture;
+
     private OnItemClickListener mItemClickListener;
     private OnItemLongClickListener mItemLongClickListener;
 
@@ -39,21 +52,21 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener {
-        private CardView cardView;
-        private TextView newsTitle;
-        private TextView newsIntro;
-        private RecyclerView newsImageList;
-        private TextView newsTime;
+        private CardView mCardView;
+        private TextView mTitleTextView;
+        private TextView mIntroTextView;
+        private RecyclerView mImageListRecView;
+        private TextView mTimeTextView;
         private OnItemClickListener mListener;
         private OnItemLongClickListener mLongClickListener;
 
         public ViewHolder(View view, OnItemClickListener listener, OnItemLongClickListener longClickListener) {
             super(view);
-            cardView = (CardView) view;
-            newsTitle = (TextView) view.findViewById(R.id.news_title);
-            newsIntro = (TextView) view.findViewById(R.id.news_intro);
-            newsImageList = (RecyclerView) view.findViewById(R.id.news_image_list);
-            newsTime = (TextView) view.findViewById(R.id.news_time);
+            mCardView = (CardView) view;
+            mTitleTextView = (TextView) view.findViewById(R.id.news_title);
+            mIntroTextView = (TextView) view.findViewById(R.id.news_intro);
+            mImageListRecView = (RecyclerView) view.findViewById(R.id.news_image_list);
+            mTimeTextView = (TextView) view.findViewById(R.id.news_time);
             this.mListener = listener;
             this.mLongClickListener = longClickListener;
             view.setOnClickListener(this);
@@ -78,6 +91,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     public NewsAdapter(List<PageItem> newsList) {
         mNewsList = newsList;
+
     }
 
     @Override
@@ -87,35 +101,28 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final PageItem pageItem = mNewsList.get(position);
-        holder.newsTitle.setText(pageItem.getTitle());
-        holder.newsIntro.setText(pageItem.getIntro());
-        holder.newsTime.setText(pageItem.getTime());
-        Log.d(TAG, "加载新闻图片");
+        PageItem pageItem = mNewsList.get(position);
+        holder.mTitleTextView.setText(pageItem.getTitle());
+        holder.mIntroTextView.setText(pageItem.getIntro());
+        holder.mTimeTextView.setText(pageItem.getTime());
+        //加载小图列表RecyclerView的属性
+        Log.d(TAG, "加载小图列表RecyclerView的属性");
         mNewsImageLayoutManager = new LinearLayoutManager(mContext);
         mNewsImageLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        holder.newsImageList.setLayoutManager(mNewsImageLayoutManager);
-        Thread t =  new Thread(new Runnable() {
+        holder.mImageListRecView.setLayoutManager(mNewsImageLayoutManager);
+        //设置小图列表的各种事件
+        mNewsImageAdapter = new NewsImageAdapter(pageItem.getImageUrlList());
+        if(mBigPicture == null) {
+            mBigPicture = new BigPicturePopupWindow(mContext, mViewHolder.mCardView);
+        }
+        //小图点击事件：查看大图
+        mNewsImageAdapter.setOnItemClickListener(new NewsImageAdapter.OnItemClickListener() {
             @Override
-            public void run() {
-                /*
-                List<Bitmap> imgList = pageItem.getImageList();
-                Log.d(TAG, "imgList.size() = " + imgList.size());
-                mNewsImageAdapter = new NewsImageAdapter(imgList);
-                */
-                List<String> imgUrlList = pageItem.getImageUrlList();
-                Log.d(TAG, "imgUrlList.size() = " + imgUrlList.size());
-                mNewsImageAdapter = new NewsImageAdapter(imgUrlList);
+            public void onItemClick(View view, int innerPosition) {
+                mBigPicture.show((ImageView) ((LinearLayout) view).getChildAt(0));
             }
         });
-        t.start();
-        try {
-            t.join(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.d(TAG, "setAdapter");
-        holder.newsImageList.setAdapter(mNewsImageAdapter);
+        holder.mImageListRecView.setAdapter(mNewsImageAdapter);
     }
 
     @Override
