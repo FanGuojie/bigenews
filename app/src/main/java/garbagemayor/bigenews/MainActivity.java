@@ -2,15 +2,13 @@ package garbagemayor.bigenews;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -32,8 +30,6 @@ import android.widget.Toast;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivityTag";
     //侧滑菜单布局
     private DrawerLayout mDrawerLayout;
+    //顶部模块
+    private Toolbar mToolbar;
+    private TextView mToolBarText;
+    //include的模式
+    private View mIncludeNormal;
+    private View mIncludeHistory;
+    private View mIncludeFavorite;
+    private View mIncludeSetting;
     //筛选器部分
     private int nowCategoryId = 0;
     private String nowSearchText = "";
@@ -99,14 +103,16 @@ public class MainActivity extends AppCompatActivity {
 
     //用ToolBar代替ActionBar
     private void initToolBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(mToolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawer_layout);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer_home);
         }
+        mToolBarText = (TextView) findViewById(R.id.main_toolbar_text);
+        mToolBarText.setText("：主页");
     }
 
     //点击左上角显示侧滑菜单
@@ -134,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initDrawerLayout() {
-        //自定义侧滑菜单各种实践的行为
+        //自定义侧滑菜单各种事件的行为
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -159,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
     //侧滑菜单里的按钮的行为
     private void initNavigationView() {
+        initIncludeMode();
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setCheckedItem(R.id.nav_homepage);
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -176,21 +183,41 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     //回到主页
                     case R.id.nav_homepage:
+                        mToolBarText.setText("：主页");
+                        mIncludeNormal.setVisibility(View.VISIBLE);
+                        mIncludeHistory.setVisibility(View.GONE);
+                        mIncludeFavorite.setVisibility(View.GONE);
+                        mIncludeSetting.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //查看历史
                     case R.id.nav_history:
+                        mToolBarText.setText("：历史");
                         Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
+                        mIncludeNormal.setVisibility(View.GONE);
+                        mIncludeHistory.setVisibility(View.VISIBLE);
+                        mIncludeFavorite.setVisibility(View.GONE);
+                        mIncludeSetting.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入收藏夹
                     case R.id.nav_favorite:
+                        mToolBarText.setText("：收藏");
                         Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
+                        mIncludeNormal.setVisibility(View.GONE);
+                        mIncludeHistory.setVisibility(View.GONE);
+                        mIncludeFavorite.setVisibility(View.VISIBLE);
+                        mIncludeSetting.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入设置界面
                     case R.id.nav_setting:
+                        mToolBarText.setText("：设置");
                         Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
+                        mIncludeNormal.setVisibility(View.GONE);
+                        mIncludeHistory.setVisibility(View.GONE);
+                        mIncludeFavorite.setVisibility(View.GONE);
+                        mIncludeSetting.setVisibility(View.VISIBLE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //连按两次退出程序
@@ -202,6 +229,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    //正常模式、查看历史模式、设置菜单模式的选择
+    private void initIncludeMode() {
+        mIncludeNormal = findViewById(R.id.main_include_normal);
+        mIncludeHistory = findViewById(R.id.main_include_history);
+        mIncludeFavorite = findViewById(R.id.main_include_favorite);
+        mIncludeSetting = findViewById(R.id.main_include_setting);
     }
 
     //连按两次退出的逻辑实现

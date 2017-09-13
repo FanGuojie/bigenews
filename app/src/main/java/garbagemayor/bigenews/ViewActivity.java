@@ -195,7 +195,9 @@ public class ViewActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        mTts.stopSpeaking();
+        if (mTts != null && mTts.isSpeaking()) {
+            mTts.stopSpeaking();
+        }
 //        Toast.makeText(ViewActivity.this,
 //                "停止播放...", Toast.LENGTH_SHORT).show();
         finish();

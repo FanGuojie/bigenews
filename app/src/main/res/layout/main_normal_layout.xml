@@ -1,0 +1,56 @@
+<!-- 筛选器和新闻浏览，他们共同属于一个上下关系的相对布局，app:xxx的属性是为了把滚动状态向外传给是为了接收外层CoordinatorLayout传来的滚动状态 -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <!-- 多重筛选，横向的相对布局，依次是“类别”、“时间”、“搜索关键字” -->
+    <LinearLayout
+        android:id="@+id/main_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:divider="@drawable/filter_divider_shape"
+        android:showDividers="middle">
+
+        <!-- 类别筛选，点击开关可以打开一个 -->
+        <Button
+            android:id="@+id/main_filter_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimaryDark"
+            />
+
+        <android.support.v7.widget.SearchView
+            android:id="@+id/main_filter_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:queryHint="@string/wait_for_input"
+            android:focusable="true"
+            android:background="@color/colorPrimaryDark"
+            />
+
+    </LinearLayout>
+
+    <!-- 新闻浏览部分，下拉刷新要给RecyclerView套一个SwipeRefreshLayout在外面，而RecyclerView里面每条新闻的模式在另一个xml里 -->
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/main_swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_news_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="horizontal"
+            />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</LinearLayout>
