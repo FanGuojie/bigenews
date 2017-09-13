@@ -270,8 +270,15 @@ public class ViewActivity extends AppCompatActivity {
 
             Log.d(TAG, urls[i]);
         }
-        if (urls.length >= len)
-            result += content.substring((urls.length-1)*textlen) + "\n";
+        if (urls.length <= len) {
+            int x = (urls.length - 1) * textlen;
+            Log.d(TAG, "urls.length = " + urls.length);
+            Log.d(TAG, "textlen = " + textlen);
+            Log.d(TAG, "len = " + len);
+            Log.d(TAG, "x = " + x);
+            Log.d(TAG, "content = " + content.length());
+            result += content.substring(x) + "\n";
+        }
         Log.d(TAG, result);
         return result;
     }

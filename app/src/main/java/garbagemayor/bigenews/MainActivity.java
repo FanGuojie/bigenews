@@ -90,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
      *  历史模式
      */
     private View mHistoryInclude;
+    private RecyclerView mHistoryRecView;
+    private StaggeredGridLayoutManager mHistoryNewsLayoutManager;
+    private NewsAdapter mHistoryNewsAdapter;
+
 
     /*
      *  收藏模式
@@ -116,8 +120,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
 
-        //加载数据库
-        initDataBase();
         //语音 初始化
         SpeechUtility.createUtility(this, SpeechConstant.APPID + "=59b15923");
         //用ToolBar代替ActionBar
@@ -126,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
         initDrawerLayout();
         //主页模式里面的东西
         initHomepage();
+        //历史模式需要的东西
+        initHistory();
 
         //设置菜单里面的东西
         initSetting();
@@ -140,10 +144,6 @@ public class MainActivity extends AppCompatActivity {
         refreshNews();
         //悬浮按钮
         initBackToTopButtom();
-    }
-
-    private void initDataBase() {
-        db = new DatabaseLoader(this.getBaseContext());
     }
 
     //用ToolBar代替ActionBar
@@ -241,12 +241,12 @@ public class MainActivity extends AppCompatActivity {
                     //查看历史
                     case R.id.nav_history:
                         mToolBarText.setText("：历史");
-                        Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
                         mHomepageInclude.setVisibility(View.GONE);
                         mHistoryInclude.setVisibility(View.VISIBLE);
                         mFavoriteInclude.setVisibility(View.GONE);
                         mSettingInclude.setVisibility(View.GONE);
                         mBackToTopFAB.setVisibility(View.GONE);
+                        loadHistory();
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入收藏夹
@@ -538,6 +538,47 @@ public class MainActivity extends AppCompatActivity {
                 mPageItemRecView.scrollToPosition(0);
             }
         });
+    }
+
+    //历史模式需要的东西
+    private void initHistory() {
+        db = new DatabaseLoader(this.getBaseContext());
+        mHistoryRecView = (RecyclerView) findViewById(R.id.main_history_list);
+        mHistoryNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        mHistoryRecView.setLayoutManager(mHistoryNewsLayoutManager);
+    }
+
+    //每次打开历史模式的时候要重新加载历史内容
+    private void loadHistory() {
+        mHistoryNewsAdapter = new NewsAdapter(db.history);
+        mHistoryNewsAdapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int postion) {
+                //点击第postion条新闻
+                closeInputMethodAnyaway();
+                PageItem pageItem = db.history.get(postion);
+                if (pageItem != null) {
+                    //Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, ViewActivity.class);
+                    intent.putExtra("id", pageItem.getId());
+                    intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
+                    db.addHistory(pageItem);
+                    startActivity(intent);
+                }
+            }
+        });
+        mHistoryNewsAdapter.setOnItemLongClickListener(new NewsAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int postion) {
+                //长按第postion条新闻
+                closeInputMethodAnyaway();
+                PageItem pageItem = db.history.get(postion);
+                if (pageItem != null) {
+                    Toast.makeText(MainActivity.this, "长按：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        mHistoryRecView.setAdapter(mHistoryNewsAdapter);
     }
 
     //设置菜单里面的东西

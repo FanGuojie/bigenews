@@ -27,7 +27,7 @@ public class DatabaseLoader{
 
     private Map<String, PageItem> page;
     private Map<String, NewsItem> news;
-    private List<PageItem> history;
+    public List<PageItem> history;
 
 
     public DatabaseLoader(Context context) {
@@ -104,9 +104,9 @@ public class DatabaseLoader{
     }
 
     public void addHistory(PageItem pageItem) {
-        Log.d(TAG, "adding");
+        if (history.contains(pageItem))
+            return;
         history.add(pageItem);
-        Log.d(TAG, "finish");
         storeNews(pageItem);
     }
 
