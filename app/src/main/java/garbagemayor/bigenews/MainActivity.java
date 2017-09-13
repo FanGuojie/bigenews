@@ -28,6 +28,9 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
+
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -76,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
 
+        //语音 初始化
+        SpeechUtility.createUtility(this, SpeechConstant.APPID + "=59b15923");
         //用ToolBar代替ActionBar
         initToolBar();
         //侧滑菜单里的按钮的行为
