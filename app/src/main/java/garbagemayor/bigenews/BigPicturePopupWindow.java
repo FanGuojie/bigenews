@@ -41,6 +41,8 @@ public class BigPicturePopupWindow {
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MainActivity mainActivity =  (MainActivity)mContext;
+                mainActivity.closeInputMethodAnyaway();
                 mPopupWindow.dismiss();
             }
         });
@@ -61,6 +63,8 @@ public class BigPicturePopupWindow {
     }
 
     public void show(ImageView sourceImageView) {
+        MainActivity mainActivity =  (MainActivity)mContext;
+        mainActivity.closeInputMethodAnyaway();
         mPhotoView.setImageDrawable(sourceImageView.getDrawable());
         mPhotoView.animaFrom(PhotoView.getImageViewInfo(sourceImageView));
         mPhotoView.setAnimaDuring(400);
