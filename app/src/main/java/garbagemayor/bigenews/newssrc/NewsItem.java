@@ -1,6 +1,7 @@
 package garbagemayor.bigenews.newssrc;
 
 public class NewsItem {
+    private String news_ID;
     private String news_Time;           //<!-- 时间 -->
     private String news_URL;            //<!-- 新闻的URL链接 -->
     private String news_Author;         //<!--新闻的作者-->
@@ -9,6 +10,9 @@ public class NewsItem {
     private String news_Title;
     private String news_Pictures;
 
+    public String getId() {
+        return news_ID;
+    }
     public String getTitle() {
         return news_Title;
     }

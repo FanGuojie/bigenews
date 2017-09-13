@@ -60,11 +60,15 @@ public class MainActivity extends AppCompatActivity{
     //连按两次“退出”按钮才退出
     private Date lastPressQuit = null;
 
+    private DatabaseLoader db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
 
+        //加载数据库
+        initDataBase();
         //用ToolBar代替ActionBar
         initToolBar();
         //侧滑菜单里的按钮的行为
@@ -78,6 +82,10 @@ public class MainActivity extends AppCompatActivity{
         //悬浮按钮
         initBackToTopButtom();
 
+    }
+
+    private void initDataBase() {
+        db = new DatabaseLoader(this.getBaseContext());
     }
 
     //用ToolBar代替ActionBar
@@ -241,6 +249,7 @@ public class MainActivity extends AppCompatActivity{
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
                     intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
+                    db.addHistory(pageItem);
                     startActivity(intent);
                 }
             }
