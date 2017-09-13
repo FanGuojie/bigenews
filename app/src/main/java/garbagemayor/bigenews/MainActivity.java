@@ -2,7 +2,6 @@ package garbagemayor.bigenews;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -47,10 +46,12 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private TextView mToolBarText;
     //include的模式
-    private View mIncludeNormal;
-    private View mIncludeHistory;
-    private View mIncludeFavorite;
-    private View mIncludeSetting;
+    private View mHomepageInclude;
+    private View mHistoryInclude;
+    private View mFavoriteInclude;
+    private View mSettingInclude;
+    //include模式里的悬浮按钮
+    private FloatingActionButton mHomepageFAB;
     //筛选器部分
     private int nowCategoryId = 0;
     private String nowSearchText = "";
@@ -88,8 +89,12 @@ public class MainActivity extends AppCompatActivity {
         initToolBar();
         //侧滑菜单的属性设置
         initDrawerLayout();
-        //侧滑菜单里的按钮的行为
-        initNavigationView();
+        //主页模式里面的东西
+        initHomepage();
+
+    }
+
+    private void initHomepage() {
         //筛选器里按钮的行为
         initNewsFilter();
         //新闻模块的显示，下拉刷新，自动加载的功能
@@ -98,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         refreshNews();
         //悬浮按钮
         initBackToTopButtom();
-
     }
 
     //用ToolBar代替ActionBar
@@ -161,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
             public void onDrawerStateChanged(int newState) {
             }
         });
+        //侧滑菜单里的按钮的行为
+        initNavigationView();
     }
 
     //侧滑菜单里的按钮的行为
@@ -184,40 +190,44 @@ public class MainActivity extends AppCompatActivity {
                     //回到主页
                     case R.id.nav_homepage:
                         mToolBarText.setText("：主页");
-                        mIncludeNormal.setVisibility(View.VISIBLE);
-                        mIncludeHistory.setVisibility(View.GONE);
-                        mIncludeFavorite.setVisibility(View.GONE);
-                        mIncludeSetting.setVisibility(View.GONE);
+                        mHomepageInclude.setVisibility(View.VISIBLE);
+                        mHistoryInclude.setVisibility(View.GONE);
+                        mFavoriteInclude.setVisibility(View.GONE);
+                        mSettingInclude.setVisibility(View.GONE);
+                        mHomepageFAB.setVisibility(View.VISIBLE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //查看历史
                     case R.id.nav_history:
                         mToolBarText.setText("：历史");
                         Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
-                        mIncludeNormal.setVisibility(View.GONE);
-                        mIncludeHistory.setVisibility(View.VISIBLE);
-                        mIncludeFavorite.setVisibility(View.GONE);
-                        mIncludeSetting.setVisibility(View.GONE);
+                        mHomepageInclude.setVisibility(View.GONE);
+                        mHistoryInclude.setVisibility(View.VISIBLE);
+                        mFavoriteInclude.setVisibility(View.GONE);
+                        mSettingInclude.setVisibility(View.GONE);
+                        mHomepageFAB.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入收藏夹
                     case R.id.nav_favorite:
                         mToolBarText.setText("：收藏");
                         Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
-                        mIncludeNormal.setVisibility(View.GONE);
-                        mIncludeHistory.setVisibility(View.GONE);
-                        mIncludeFavorite.setVisibility(View.VISIBLE);
-                        mIncludeSetting.setVisibility(View.GONE);
+                        mHomepageInclude.setVisibility(View.GONE);
+                        mHistoryInclude.setVisibility(View.GONE);
+                        mFavoriteInclude.setVisibility(View.VISIBLE);
+                        mSettingInclude.setVisibility(View.GONE);
+                        mHomepageFAB.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入设置界面
                     case R.id.nav_setting:
                         mToolBarText.setText("：设置");
                         Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
-                        mIncludeNormal.setVisibility(View.GONE);
-                        mIncludeHistory.setVisibility(View.GONE);
-                        mIncludeFavorite.setVisibility(View.GONE);
-                        mIncludeSetting.setVisibility(View.VISIBLE);
+                        mHomepageInclude.setVisibility(View.GONE);
+                        mHistoryInclude.setVisibility(View.GONE);
+                        mFavoriteInclude.setVisibility(View.GONE);
+                        mSettingInclude.setVisibility(View.VISIBLE);
+                        mHomepageFAB.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //连按两次退出程序
@@ -233,10 +243,10 @@ public class MainActivity extends AppCompatActivity {
 
     //正常模式、查看历史模式、设置菜单模式的选择
     private void initIncludeMode() {
-        mIncludeNormal = findViewById(R.id.main_include_normal);
-        mIncludeHistory = findViewById(R.id.main_include_history);
-        mIncludeFavorite = findViewById(R.id.main_include_favorite);
-        mIncludeSetting = findViewById(R.id.main_include_setting);
+        mHomepageInclude = findViewById(R.id.main_include_homepage);
+        mHistoryInclude = findViewById(R.id.main_include_history);
+        mFavoriteInclude = findViewById(R.id.main_include_favorite);
+        mSettingInclude = findViewById(R.id.main_include_setting);
     }
 
     //连按两次退出的逻辑实现
@@ -478,8 +488,8 @@ public class MainActivity extends AppCompatActivity {
 
     //设置返回顶部的按钮
     private void initBackToTopButtom() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.main_floating);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mHomepageFAB = (FloatingActionButton) findViewById(R.id.main_homepage_floating);
+        mHomepageFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 closeInputMethodAnyaway();

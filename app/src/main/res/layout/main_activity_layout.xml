@@ -44,9 +44,9 @@
         </android.support.design.widget.AppBarLayout>
 
         <include
-            android:id="@+id/main_include_normal"
+            android:id="@+id/main_include_homepage"
             android:visibility="visible"
-            layout="@layout/main_normal_layout"
+            layout="@layout/main_homepage_layout"
             />
 
         <include
@@ -69,7 +69,7 @@
 
         <!-- 一个悬浮按钮，回到顶部，说不定还可以放一大串按钮 -->
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/main_floating"
+            android:id="@+id/main_homepage_floating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"

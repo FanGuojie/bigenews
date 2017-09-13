@@ -1,8 +1,8 @@
 <!-- 筛选器和新闻浏览，他们共同属于一个上下关系的相对布局，app:xxx的属性是为了把滚动状态向外传给是为了接收外层CoordinatorLayout传来的滚动状态 -->
 <LinearLayout
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
