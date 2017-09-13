@@ -21,8 +21,8 @@ import java.net.URL;
 class HtmlImageGetter implements Html.ImageGetter {
           
 
-            TextView mtvActNewsContent;
             Context mContext;
+            TextView mtvActNewsContent;
 
             public HtmlImageGetter(Context contxt, TextView textView) {
                 this.mContext = contxt;

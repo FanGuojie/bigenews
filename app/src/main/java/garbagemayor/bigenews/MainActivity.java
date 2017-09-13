@@ -109,11 +109,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private DatabaseLoader db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_layout);
 
+        //加载数据库
+        initDataBase();
         //语音 初始化
         SpeechUtility.createUtility(this, SpeechConstant.APPID + "=59b15923");
         //用ToolBar代替ActionBar
@@ -136,6 +140,10 @@ public class MainActivity extends AppCompatActivity {
         refreshNews();
         //悬浮按钮
         initBackToTopButtom();
+    }
+
+    private void initDataBase() {
+        db = new DatabaseLoader(this.getBaseContext());
     }
 
     //用ToolBar代替ActionBar
@@ -414,6 +422,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
                     intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
+                    db.addHistory(pageItem);
                     startActivity(intent);
                 }
             }
