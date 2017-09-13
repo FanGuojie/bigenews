@@ -15,5 +15,7 @@
     <string name="advertisement">广告位招租&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;广告位招租</string>
     <string name="category">分类</string>
     <string name="wait_for_input">请输入搜索内容</string>
+    <string name="textsize">字体大小</string>
+    <string name="spread">展开</string>
 
 </resources>

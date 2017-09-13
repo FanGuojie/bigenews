@@ -2,6 +2,7 @@ package garbagemayor.bigenews;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -10,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -22,7 +24,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,21 +43,24 @@ import garbagemayor.bigenews.newssrc.PageItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    /*
+     *  各个模式公用
+     */
     //调试Log的标记
     private static final String TAG = "MainActivityTag";
+    //连按两次“退出”按钮才退出
+    private Date lastPressQuit = null;
     //侧滑菜单布局
     private DrawerLayout mDrawerLayout;
     //顶部模块
     private Toolbar mToolbar;
     private TextView mToolBarText;
-    //include的模式
+
+    /*
+     *  主页模式
+     */
     private View mHomepageInclude;
-    private View mHistoryInclude;
-    private View mFavoriteInclude;
-    private View mSettingInclude;
-    //include模式里的悬浮按钮
-    private FloatingActionButton mHomepageFAB;
-    //筛选器部分
+    //筛选条件
     private int nowCategoryId = 0;
     private String nowSearchText = "";
     //类别筛选
@@ -73,10 +81,33 @@ public class MainActivity extends AppCompatActivity {
     //新闻加载器部分
     private boolean isLoading = false;
     private PagePlus mPage;
-    private int mPageId;
-    private static int mPageSize = 10;
-    //连按两次“退出”按钮才退出
-    private Date lastPressQuit = null;
+    private int nowPageId;
+    private static int sizeOfPage = 10;
+    //悬浮按钮
+    private FloatingActionButton mBackToTopFAB;
+
+    /*
+     *  历史模式
+     */
+    private View mHistoryInclude;
+
+    /*
+     *  收藏模式
+     */
+    private View mFavoriteInclude;
+
+    /*
+     *  设置模式
+     */
+    private View mSettingInclude;
+    //字体大小设置
+    private RelativeLayout mTextsizeEmerging;
+    private ImageView mTextsizeSpread;
+    private RelativeLayout mTextsizeHidden;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
         //主页模式里面的东西
         initHomepage();
 
+        //设置菜单里面的东西
+        initSetting();
     }
 
     private void initHomepage() {
@@ -194,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                         mHistoryInclude.setVisibility(View.GONE);
                         mFavoriteInclude.setVisibility(View.GONE);
                         mSettingInclude.setVisibility(View.GONE);
-                        mHomepageFAB.setVisibility(View.VISIBLE);
+                        mBackToTopFAB.setVisibility(View.VISIBLE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //查看历史
@@ -205,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                         mHistoryInclude.setVisibility(View.VISIBLE);
                         mFavoriteInclude.setVisibility(View.GONE);
                         mSettingInclude.setVisibility(View.GONE);
-                        mHomepageFAB.setVisibility(View.GONE);
+                        mBackToTopFAB.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入收藏夹
@@ -216,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                         mHistoryInclude.setVisibility(View.GONE);
                         mFavoriteInclude.setVisibility(View.VISIBLE);
                         mSettingInclude.setVisibility(View.GONE);
-                        mHomepageFAB.setVisibility(View.GONE);
+                        mBackToTopFAB.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入设置界面
@@ -227,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                         mHistoryInclude.setVisibility(View.GONE);
                         mFavoriteInclude.setVisibility(View.GONE);
                         mSettingInclude.setVisibility(View.VISIBLE);
-                        mHomepageFAB.setVisibility(View.GONE);
+                        mBackToTopFAB.setVisibility(View.GONE);
                         mDrawerLayout.closeDrawers();
                         break;
                     //连按两次退出程序
@@ -441,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setRefreshing(true);
         mNewsList.clear();
         mNewsAdapter.notifyDataSetChanged();
-        mPageId = 0;
+        nowPageId = 0;
         loadAPageOfNewNews();
         mSwipeRefreshLayout.setRefreshing(false);
     }
@@ -455,15 +488,15 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "loadAPageOfNewNews.run()  nowCategoryId = " + nowCategoryId + " nowSearchText = " + nowSearchText);
                 if (nowCategoryId == 0) {
                     if (nowSearchText.equals("")) {
-                        mPage = new PagePlus(++mPageId, mPageSize);
+                        mPage = new PagePlus(++nowPageId, sizeOfPage);
                     } else {
-                        mPage = new PagePlus(nowSearchText, ++mPageId, mPageSize);
+                        mPage = new PagePlus(nowSearchText, ++nowPageId, sizeOfPage);
                     }
                 } else {
                     if (nowSearchText.equals("")) {
-                        mPage = new PagePlus(nowCategoryId, ++mPageId, mPageSize);
+                        mPage = new PagePlus(nowCategoryId, ++nowPageId, sizeOfPage);
                     } else {
-                        mPage = new PagePlus(nowSearchText, nowCategoryId, ++mPageId, mPageSize);
+                        mPage = new PagePlus(nowSearchText, nowCategoryId, ++nowPageId, sizeOfPage);
                     }
                 }
             }
@@ -488,8 +521,8 @@ public class MainActivity extends AppCompatActivity {
 
     //设置返回顶部的按钮
     private void initBackToTopButtom() {
-        mHomepageFAB = (FloatingActionButton) findViewById(R.id.main_homepage_floating);
-        mHomepageFAB.setOnClickListener(new View.OnClickListener() {
+        mBackToTopFAB = (FloatingActionButton) findViewById(R.id.main_homepage_floating);
+        mBackToTopFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 closeInputMethodAnyaway();
@@ -497,5 +530,76 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    //设置菜单里面的东西
+    private void initSetting() {
+        //字体大小设置
+        initSettingTextsize();
+
+
+
+
+
+    }
+
+    //字体大小设置
+    private void initSettingTextsize() {
+        mTextsizeEmerging = (RelativeLayout) findViewById(R.id.main_setting_textsize_emerging);
+        mTextsizeSpread = (ImageView) findViewById(R.id.main_setting_textsize_spread);
+        mTextsizeHidden = (RelativeLayout) findViewById(R.id.main_setting_textsize_hidden);
+        //显示隐藏部分的点击事件
+        mTextsizeEmerging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                spreadSettingTextsize();
+            }
+        });
+        //隐藏部分收回去的点击事件
+        mTextsizeHidden.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hiddenSettingTextsize();
+            }
+        });
+        //按钮控制显示或收回事件
+        mTextsizeSpread.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mTextsizeHidden.getVisibility() == View.GONE) {
+                    spreadSettingTextsize();
+                } else {
+                    hiddenSettingTextsize();
+                }
+            }
+        });
+    }
+    private void spreadSettingTextsize() {
+        mTextsizeHidden.setVisibility(View.VISIBLE);
+        mTextsizeSpread.setRotation(180.0f);
+    }
+    private void hiddenSettingTextsize() {
+        mTextsizeHidden.setVisibility(View.GONE);
+        mTextsizeSpread.setRotation(0.0f);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
