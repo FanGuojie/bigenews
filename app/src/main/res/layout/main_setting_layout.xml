@@ -52,24 +52,45 @@
         </RelativeLayout>
 
         <!-- 字体设置的隐藏部分 -->
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/main_setting_textsize_hidden"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:visibility="gone"
             >
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/main_setting_textsize_sample"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/sample_sentence"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                />
 
+            <SeekBar
+                android:id="@+id/main_setting_textsize_seekbar"
+                android:layout_width="360dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="center_horizontal"
+                android:max="4"
+                android:progress="2"
+                />
+
+        </LinearLayout>
+
+        <!-- 间隔 -->
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:background="@color/colorPrimaryDark"
             />
-
-
-
-
 
 
     </LinearLayout>

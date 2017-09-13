@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     //字体大小设置
     private RelativeLayout mTextsizeEmerging;
     private ImageView mTextsizeSpread;
-    private RelativeLayout mTextsizeHidden;
+    private LinearLayout mTextsizeHidden;
 
 
 
@@ -546,7 +546,7 @@ public class MainActivity extends AppCompatActivity {
     private void initSettingTextsize() {
         mTextsizeEmerging = (RelativeLayout) findViewById(R.id.main_setting_textsize_emerging);
         mTextsizeSpread = (ImageView) findViewById(R.id.main_setting_textsize_spread);
-        mTextsizeHidden = (RelativeLayout) findViewById(R.id.main_setting_textsize_hidden);
+        mTextsizeHidden = (LinearLayout) findViewById(R.id.main_setting_textsize_hidden);
         //显示隐藏部分的点击事件
         mTextsizeEmerging.setOnClickListener(new View.OnClickListener() {
             @Override
