@@ -17,9 +17,11 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
 
     private Context mContext;
     private List<NewsList.ListBean> newsList = new ArrayList<>();
-    private LinearLayoutManager linearLayoutManager;
     MyCallBack callback;
 
+    NewsListViewAdapter(Context context) {
+        mContext = context;
+    }
     void addData (int category) {
         callback = new MyCallBack() {
             @Override
@@ -37,13 +39,11 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
         newsList.clear();
     }
 
-    NewsListViewAdapter(Context context) {
-        mContext = context;
-    }
-
     class ViewHolder extends RecyclerView.ViewHolder {
         View mView;
         TextView mTitleView;
+        TextView mIntroView;
+        TextView mTimeView;
         RecyclerView mImagesView;
         NewsList.ListBean mItem;
 
@@ -51,7 +51,9 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
             super(view);
             mView = view;
             mTitleView = view.findViewById(R.id.title);
+            mIntroView = view.findViewById(R.id.intro);
             mImagesView = view.findViewById(R.id.images);
+            mTimeView = view.findViewById(R.id.time);
         }
     }
 
@@ -63,15 +65,17 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        linearLayoutManager = new LinearLayoutManager(mContext);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        holder.mImagesView.setLayoutManager(linearLayoutManager);
         holder.mTitleView.setText(newsList.get(position).getNews_Title());
+        holder.mIntroView.setText(newsList.get(position).getNews_Intro());
         String url = newsList.get(position).getNews_Pictures();
         if (!url.equals("")) {
+            LinearLayoutManager l = new LinearLayoutManager(mContext);
+            l.setOrientation(LinearLayoutManager.HORIZONTAL);
+            holder.mImagesView.setLayoutManager(l);
             ImageAdapter adapter = new ImageAdapter(Arrays.asList(url.split(";")), mContext);
             holder.mImagesView.setAdapter(adapter);
         }
+        holder.mTimeView.setText(newsList.get(position).getNews_Time());
         holder.mItem = newsList.get(position);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -16,7 +16,6 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
     private List<String> mImages;
     private Context mContext;
-    private LinearLayoutManager linearLayoutManager;
 
     ImageAdapter(List<String> l, Context context) {
         mImages = l;

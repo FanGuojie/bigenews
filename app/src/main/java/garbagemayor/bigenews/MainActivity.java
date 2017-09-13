@@ -37,17 +37,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         SpeechUtility.createUtility(this, SpeechConstant.APPID + "=59b15923");
         pageProvider = new PageProvider();
-//        toolbar = (Toolbar) findViewById(R.id.toolBar);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         mFragmentList = new HashMap<>();
         mFragmentTitleList = new HashMap<>();
-
-//        setSupportActionBar(toolbar);
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayHomeAsUpEnabled(true);
-//        }
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         // bundle
@@ -57,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
         fragment.setArguments(category);
         adapter.addFrag(fragment, "TECHNOLOGY");
 
-        NewsListFragment fragment2 = new NewsListFragment();
-        Bundle category2 = new Bundle();
-        category2.putInt("category", NewsAPI.EDUCATION);
-        fragment.setArguments(category2);
-        adapter.addFrag(fragment2, "EDUCATION");
+//        NewsListFragment fragment2 = new NewsListFragment();
+//        Bundle category2 = new Bundle();
+//        category2.putInt("category", NewsAPI.EDUCATION);
+//        fragment2.setArguments(category2);
+//        adapter.addFrag(fragment2, "EDUCATION");
         // on this list
 //        mFragmentList.put(NewsAPI.EDUCATION, fragment);
 //        mFragmentTitleList.put(NewsAPI.EDUCATION, "EDUCATION");
@@ -77,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //        adapter = new ViewPagerAdapter(getSupportFragmentManager(), l1, l2);
         viewPager.setAdapter(adapter);
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+//        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabLayout.setupWithViewPager(viewPager);
     }
 
