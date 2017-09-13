@@ -41,7 +41,6 @@ public class ViewActivity extends AppCompatActivity {
     public static final String TAG = "ViewActivityTag";
     private SpeechSynthesizer mTts;
     private boolean mTtsInited;
-    private boolean mTtsPlaying;
     private boolean mTtsPaused;
     private static int textlen = 100;
 
@@ -173,7 +172,7 @@ public class ViewActivity extends AppCompatActivity {
             }
         }
 
-        if (!mTtsPlaying) {
+        if (!mTts.isSpeaking()) {
             //3.开始合成
             int ret = mTts.startSpeaking(news.getContent(), mSynListener);
             if (ret != ErrorCode.SUCCESS) {
@@ -181,21 +180,14 @@ public class ViewActivity extends AppCompatActivity {
                         "语音合成失败，错误码: " + ret,
                         Toast.LENGTH_SHORT).show();
             } else {
-                mTtsPlaying = true;
-                Toast.makeText(ViewActivity.this,
-                        "朗读中...", Toast.LENGTH_SHORT).show();
                 //TODO 改按钮图
             }
         } else if (mTtsPaused) {
             mTts.resumeSpeaking();
-            Toast.makeText(ViewActivity.this,
-                    "继续播放...", Toast.LENGTH_SHORT).show();
             //TODO 改按钮图
             mTtsPaused = false;
         } else {
             mTts.pauseSpeaking();
-            Toast.makeText(ViewActivity.this,
-                    "暂停播放...", Toast.LENGTH_SHORT).show();
             //TODO 改按钮图
             mTtsPaused = true;
         }
@@ -204,8 +196,8 @@ public class ViewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         mTts.stopSpeaking();
-        Toast.makeText(ViewActivity.this,
-                "停止播放...", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(ViewActivity.this,
+//                "停止播放...", Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -213,7 +205,6 @@ public class ViewActivity extends AppCompatActivity {
     private SynthesizerListener mSynListener = new SynthesizerListener() {
         //会话结束回调接口，没有错误时，error为null
         public void onCompleted(SpeechError error) {
-            mTtsPlaying = false;
             if (error == null) {
                 Log.d("mTts", "播放完成");
                 Toast.makeText(ViewActivity.this,
@@ -232,10 +223,14 @@ public class ViewActivity extends AppCompatActivity {
 
         //开始播放
         public void onSpeakBegin() {
+            Toast.makeText(ViewActivity.this,
+                    "朗读中...", Toast.LENGTH_SHORT).show();
         }
 
         //暂停播放
         public void onSpeakPaused() {
+            Toast.makeText(ViewActivity.this,
+                    "暂停播放...", Toast.LENGTH_SHORT).show();
         }
 
         //播放进度回调
@@ -245,6 +240,8 @@ public class ViewActivity extends AppCompatActivity {
 
         //恢复播放回调接口
         public void onSpeakResumed() {
+            Toast.makeText(ViewActivity.this,
+                    "继续播放...", Toast.LENGTH_SHORT).show();
         }
 
         //会话事件回调接口
