@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -183,18 +184,29 @@ public class ViewActivity extends AppCompatActivity {
                 mTtsPlaying = true;
                 Toast.makeText(ViewActivity.this,
                         "朗读中...", Toast.LENGTH_SHORT).show();
+                //TODO 改按钮图
             }
         } else if (mTtsPaused) {
             mTts.resumeSpeaking();
             Toast.makeText(ViewActivity.this,
                     "继续播放...", Toast.LENGTH_SHORT).show();
+            //TODO 改按钮图
             mTtsPaused = false;
         } else {
             mTts.pauseSpeaking();
             Toast.makeText(ViewActivity.this,
                     "暂停播放...", Toast.LENGTH_SHORT).show();
+            //TODO 改按钮图
             mTtsPaused = true;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        mTts.stopSpeaking();
+        Toast.makeText(ViewActivity.this,
+                "停止播放...", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     //合成监听器
