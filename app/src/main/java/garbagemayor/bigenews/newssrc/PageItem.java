@@ -27,6 +27,10 @@ public class PageItem {
     private String news_Pictures;          //<!--新闻的图片路径-->
     private String news_Video;
     private String news_Intro;             //<!-- 简介 -->
+    public PageItem(NewsItem item) {
+        this.news_Title = item.getTitle();
+        this.news_Time = item.getTime();
+    }
 
     public String print() {
         return "newsClassTag; " + newsClassTag + "\n" +

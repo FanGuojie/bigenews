@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,10 +34,8 @@ public class DatabaseLoader{
 
     Context mContext;
 
-    private SQLiteDatabase db;
-
-    private Map<String, PageItem> page;
-    private Map<String, NewsItem> news;
+//    private Map<String, PageItem> page;
+//    private Map<String, NewsItem> news;
     public List<PageItem> history;
     public List<PageItem> history_list;
     public NewsItem item;
@@ -47,8 +46,15 @@ public class DatabaseLoader{
     public DatabaseLoader(Context context) {
         this.mContext = context;
         history = new ArrayList<>();
-        page = new HashMap<>();
-        news = new HashMap<>();
+//        page = new HashMap<>();
+//        news = new HashMap<>();
+        String[] filelist = mContext.fileList();
+        for (String file : filelist) {
+            if (file.contains("2016")) {
+//                Toast.makeText(mContext, file, Toast.LENGTH_SHORT).show();
+                history.add(new PageItem(queryNews(file)));
+            }
+        }
 //        String DBName = context.getApplicationInfo().dataDir + "/databases/test.db";//android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "test.db";
 //        File f_=new File(DBName);
 //            if(!f_.getParentFile().exists()){
@@ -109,7 +115,7 @@ public class DatabaseLoader{
 //            return null;
 //    }
 
-    public NewsItem queryNews(String id) {
+    public NewsItem queryNews(final String id) {
         online = false;
         Thread thread = new Thread() {
             @Override
@@ -130,15 +136,30 @@ public class DatabaseLoader{
             e.printStackTrace();
         }
         if (DatabaseLoader.online) {
-            item = PagePlus.getNewsItem(id);
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                            item = PagePlus.getNewsItem(id);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
             try {
-               writeJsonStream(mContext.openFileOutput(id + ".json", Context.MODE_PRIVATE), item);
+                t.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+               writeJsonStream(mContext.openFileOutput(item.getId(), Context.MODE_PRIVATE), item);
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
         } else {
             try {
-                item = readJsonStreamDetail(mContext.openFileInput(id + ".json"));
+                item = readJsonStreamDetail(mContext.openFileInput(id));
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
@@ -146,14 +167,7 @@ public class DatabaseLoader{
         return item;
     }
 
-//    public void addHistory(PageItem pageItem) {
-//        if (history.contains(pageItem))
-//            return;
-//        history.add(pageItem);
-//        storeNews(pageItem);
-//    }
-
-    public List<PageItem> queryPage(int i, int sizeOfPage) {
+    public List<PageItem> queryPage(final int i, final int sizeOfPage) {
         online = false;
         Thread thread = new Thread() {
             @Override
@@ -174,9 +188,23 @@ public class DatabaseLoader{
             e.printStackTrace();
         }
         if (DatabaseLoader.online) {
-            PagePlus p = new PagePlus(i, sizeOfPage);
-            history_list = Arrays.asList(p.cont);
-            Log.d(TAG, "queryPage: ");
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        PagePlus p = new PagePlus(i, sizeOfPage);
+                        history_list = Arrays.asList(p.cont);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+            try {
+                t.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             try {
                 writeJsonStream(mContext.openFileOutput(fileName, Context.MODE_PRIVATE), history_list);
             } catch (Exception ee) {
@@ -192,10 +220,44 @@ public class DatabaseLoader{
         return history_list;
     }
 
-    public List<PageItem> queryPage(int nowCategoryId, int i, int sizeOfPage) {
+    public List<PageItem> queryPage(final int nowCategoryId, final int i, final int sizeOfPage) {
+        online = false;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
+                        DatabaseLoader.online = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (DatabaseLoader.online) {
-            PagePlus p = new PagePlus(nowCategoryId, i, sizeOfPage);
-            history_list = Arrays.asList(p.cont);
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        PagePlus p = new PagePlus(nowCategoryId, i, sizeOfPage);
+                        history_list = Arrays.asList(p.cont);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+            try {
+                t.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             try {
                 writeJsonStream(mContext.openFileOutput(fileName, Context.MODE_PRIVATE), history_list);
             } catch (Exception ee) {
@@ -211,10 +273,44 @@ public class DatabaseLoader{
         return history_list;
     }
 
-    public List<PageItem> queryPage(String nowSearchText, int i, int sizeOfPage) {
+    public List<PageItem> queryPage(final String nowSearchText, final int i, final int sizeOfPage) {
+        online = false;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
+                        DatabaseLoader.online = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (DatabaseLoader.online) {
-            PagePlus p = new PagePlus(nowSearchText, i, sizeOfPage);
-            history_list = Arrays.asList(p.cont);
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        PagePlus p = new PagePlus(nowSearchText, i, sizeOfPage);
+                        history_list = Arrays.asList(p.cont);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+            try {
+                t.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             try {
                 writeJsonStream(mContext.openFileOutput(fileName, Context.MODE_PRIVATE), history_list);
             } catch (Exception ee) {
@@ -230,10 +326,44 @@ public class DatabaseLoader{
         return history_list;
     }
 
-    public List<PageItem> queryPage(String nowSearchText, int nowCategoryId, int i, int sizeOfPage) {
+    public List<PageItem> queryPage(final String nowSearchText, final int nowCategoryId, final int i, final int sizeOfPage) {
+        online = false;
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
+                        DatabaseLoader.online = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (DatabaseLoader.online) {
-            PagePlus p = new PagePlus(nowSearchText, nowCategoryId, i, sizeOfPage);
-            history_list = Arrays.asList(p.cont);
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        PagePlus p = new PagePlus(nowSearchText, nowCategoryId, i, sizeOfPage);
+                        history_list = Arrays.asList(p.cont);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+            try {
+                t.join();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             try {
                 writeJsonStream(mContext.openFileOutput(fileName, Context.MODE_PRIVATE), history_list);
             } catch (Exception ee) {

@@ -768,6 +768,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 SharedPreferences sharedPreferences = getSharedPreferences("visited", Activity.MODE_PRIVATE);
                 sharedPreferences.edit().clear().apply();
+                String[] filelist = fileList();
+                for (String file : filelist) {
+                    if (file.contains("2016")) {
+                        Log.d(TAG, "onClick: " + file);
+                        deleteFile(file);
+                    }
+                }
                 refreshNews();
                 Toast.makeText(MainActivity.this, "已清除", Toast.LENGTH_SHORT).show();
             }
