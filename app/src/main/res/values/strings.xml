@@ -20,5 +20,6 @@
     <string name="sample_sentence">BigeNews\n哔嗝资讯：大新闻\n苟利国家生死矣\n岂因祸福避趋之</string>
     <string name="category_option">筛选分类</string>
     <string name="gogogo">立即生效</string>
+    <string name="clear_history">清除缓存</string>
 
 </resources>

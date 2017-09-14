@@ -12,6 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -119,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mTextsizeSpread;
     private LinearLayout mTextsizeHidden;
     private Button mTextsizeBtn;
+    //清除缓存
+    private Button mClearHistoryBtn;
 
 
 
@@ -455,6 +458,9 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("id", pageItem.getId());
                     intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
                     db.addHistory(pageItem);
+                    SharedPreferences sharedPreferences = getSharedPreferences("visited", Activity.MODE_PRIVATE);
+                    sharedPreferences.edit().putBoolean(pageItem.getTitle(), true).apply();
+                    ((TextView) view.findViewById(R.id.news_title)).setTextColor(getResources().getColor(R.color.main_newscard_title_visited));
                     startActivity(intent);
                 }
             }
@@ -618,7 +624,8 @@ public class MainActivity extends AppCompatActivity {
         initSettingCategory();
         //字体大小设置
         initSettingTextsize();
-
+        //清除缓存按钮
+        initSettingClear();
 
 
     }
@@ -717,6 +724,19 @@ public class MainActivity extends AppCompatActivity {
         mTextsizeSpread.setRotation(0.0f);
     }
 
+    //清除缓存
+    private void initSettingClear() {
+        mClearHistoryBtn = (Button) findViewById(R.id.main_setting_clear_gogogo);
+        mClearHistoryBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sharedPreferences = getSharedPreferences("visited", Activity.MODE_PRIVATE);
+                sharedPreferences.edit().clear().apply();
+                refreshNews();
+                Toast.makeText(MainActivity.this, "已清除", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 
 

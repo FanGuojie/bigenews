@@ -1,6 +1,9 @@
 package garbagemayor.bigenews;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -103,6 +106,20 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         PageItem pageItem = mNewsList.get(position);
         holder.mTitleTextView.setText(pageItem.getTitle());
+
+
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences("visited", Activity.MODE_PRIVATE);
+        Log.d(TAG, pageItem.getTitle() + position);
+        if(sharedPreferences.getBoolean(pageItem.getTitle(), false)) {
+            Log.d(TAG, "RED");
+            holder.mTitleTextView.setTextColor(mContext.getResources().getColor(R.color.main_newscard_title_visited));
+        } else {
+            holder.mTitleTextView.setTextColor(mContext.getResources().getColor(R.color.main_newscard_title));
+
+        }
+
+
+
         holder.mIntroTextView.setText(pageItem.getIntro());
         holder.mTimeTextView.setText(pageItem.getTime());
         //加载小图列表RecyclerView的属性
