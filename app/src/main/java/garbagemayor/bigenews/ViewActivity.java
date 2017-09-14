@@ -180,15 +180,15 @@ public class ViewActivity extends AppCompatActivity {
                         "语音合成失败，错误码: " + ret,
                         Toast.LENGTH_SHORT).show();
             } else {
-                //TODO 改按钮图
+                ((CircleButton) findViewById(R.id.button_download)).setImageResource(R.mipmap.suspend);
             }
         } else if (mTtsPaused) {
             mTts.resumeSpeaking();
-            //TODO 改按钮图
+            ((CircleButton) findViewById(R.id.button_download)).setImageResource(R.mipmap.suspend);
             mTtsPaused = false;
         } else {
             mTts.pauseSpeaking();
-            //TODO 改按钮图
+            ((CircleButton) findViewById(R.id.button_download)).setImageResource(R.mipmap.play);
             mTtsPaused = true;
         }
     }

@@ -93,7 +93,7 @@
                     android:layout_width="64dip"
                     android:layout_height="64dip"
                     android:layout_weight="1"
-                    android:src="@mipmap/download"
+                    android:src="@mipmap/play"
                     app:cb_color="#99CC00"
                     app:cb_pressedRingWidth="8dip" />
 
