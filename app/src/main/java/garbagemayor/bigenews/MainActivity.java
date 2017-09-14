@@ -662,8 +662,6 @@ public class MainActivity extends AppCompatActivity {
         initSettingClear();
         //夜间模式切换
         initSettingNightstyle();
-        //填满屏幕
-        initSettingFill();
     }
 
     //自定义分类菜单
@@ -810,10 +808,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
-    private void initSettingFill() {
-        //
-    }
-
 }
 

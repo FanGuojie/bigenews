@@ -1,5 +1,7 @@
 package garbagemayor.bigenews.newssrc;
 
+import android.util.Log;
+
 public class NewsItem {
     private String news_ID;
     private String news_Time;           //<!-- 时间 -->
@@ -26,7 +28,14 @@ public class NewsItem {
         return news_Author;
     }
     public String getTime() {
-        return news_Time;
+        try {
+            int year = Integer.parseInt(news_Time.substring(0, 4));
+            int month = Integer.parseInt(news_Time.substring(4, 6));
+            int day = Integer.parseInt(news_Time.substring(6, 8));
+            return year + "年" + month + "月" + day + "日";
+        } catch (Exception e) {
+            return "未知时间" + news_Time;
+        }
     }
     public String getJournal() {
         return news_Journal;
