@@ -1,8 +1,9 @@
 package garbagemayor.bigenews;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
+import android.content.SharedPreferences;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,7 +12,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -35,6 +35,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -61,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private View mHomepageInclude;
     //筛选条件
-    private int nowCategoryId = 0;
+    private int nowCategoryId = -1;
     private String nowSearchText = "";
     //类别筛选
     private Button mCategoryBtn;
     private GridView mCategoryGridView;
     private ArrayAdapter<String> mCategoryAdapter;
-    private List<String> mCategoryList;
+    private List<String> mCategoryList = new ArrayList<>();
     private PopupWindow mCategoryPopupWindow;
     //搜索模块
     private SearchView mSearchView;
@@ -104,10 +105,20 @@ public class MainActivity extends AppCompatActivity {
      *  设置模式
      */
     private View mSettingInclude;
+    //分类菜单设置
+    private List<String> mAllCategoryList = Arrays.asList("最新", "科技", "教育", "军事", "国内", "社会", "文化", "汽车", "国际", "体育", "财经", "健康", "娱乐");
+    private RelativeLayout mCategoryOptionEmerging;
+    private ImageView mCategoryOptionSpread;
+    private LinearLayout mCategoryOptionHidden;
+    private RecyclerView mCategoryOptionRecView;
+    private Button mCategoryOptionBtn;
+    private StaggeredGridLayoutManager mCategoryOptionLayoutManager;
+    private SettingCategoryAdapter mCategoryOptionAdapter;
     //字体大小设置
     private RelativeLayout mTextsizeEmerging;
     private ImageView mTextsizeSpread;
     private LinearLayout mTextsizeHidden;
+    private Button mTextsizeBtn;
 
 
 
@@ -133,17 +144,6 @@ public class MainActivity extends AppCompatActivity {
 
         //设置菜单里面的东西
         initSetting();
-    }
-
-    private void initHomepage() {
-        //筛选器里按钮的行为
-        initNewsFilter();
-        //新闻模块的显示，下拉刷新，自动加载的功能
-        initShowNews();
-        //第一页新闻
-        refreshNews();
-        //悬浮按钮
-        initBackToTopButtom();
     }
 
     //用ToolBar代替ActionBar
@@ -263,7 +263,6 @@ public class MainActivity extends AppCompatActivity {
                     //进入设置界面
                     case R.id.nav_setting:
                         mToolBarText.setText("：设置");
-                        Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
                         mHomepageInclude.setVisibility(View.GONE);
                         mHistoryInclude.setVisibility(View.GONE);
                         mFavoriteInclude.setVisibility(View.GONE);
@@ -310,23 +309,50 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initHomepage() {
+        //筛选器里按钮的行为
+        initNewsFilter();
+        //新闻模块的显示，下拉刷新，自动加载的功能
+        initShowNews();
+        //第一页新闻
+        refreshNews();
+        //悬浮按钮
+        initBackToTopButtom();
+    }
+
     //筛选器里面的按钮的行为
     private void initNewsFilter() {
-        //“类别”按钮的内容
-        mCategoryList = new ArrayList<>();
-        mCategoryList.add("最新");
-        mCategoryList.add("科技");
-        mCategoryList.add("教育");
-        mCategoryList.add("军事");
-        mCategoryList.add("国内");
-        mCategoryList.add("社会");
-        mCategoryList.add("文化");
-        mCategoryList.add("汽车");
-        mCategoryList.add("国际");
-        mCategoryList.add("体育");
-        mCategoryList.add("财经");
-        mCategoryList.add("健康");
-        mCategoryList.add("娱乐");
+        //设置分类模块
+        initFilterCategory();
+        //设置搜索模块
+        initFilterSearch();
+    }
+
+    //筛选器里的分类模块
+    private void initFilterCategory() {
+        //“分类”按钮的内容
+        SharedPreferences sharedPreferences = getSharedPreferences("setting", Activity.MODE_PRIVATE);
+        mCategoryList.clear();
+        for(String option: mAllCategoryList) {
+            Log.d(TAG, option + " " + sharedPreferences.getBoolean(option, true));
+            if(sharedPreferences.getBoolean(option, true)) {
+                mCategoryList.add(option);
+            }
+        }
+        String firstOptionName;
+        if(mCategoryList.size() > 0) {
+            firstOptionName = mCategoryList.get(0);
+        } else {
+            firstOptionName = "最新";
+        }
+        int firstOptionId = mAllCategoryList.indexOf(firstOptionName);
+        if(nowCategoryId == -1) {
+            nowCategoryId = firstOptionId;
+        } else if(nowCategoryId != firstOptionId) {
+            nowCategoryId = firstOptionId;
+            refreshNews();
+        }
+        Log.d(TAG, "firstOption = " + firstOptionName + " " + firstOptionId);
         //设置弹出窗口的属性
         View contentView = MainActivity.this.getLayoutInflater().inflate(R.layout.filter_category_layout, null);
         mCategoryPopupWindow = new PopupWindow(contentView, GridView.LayoutParams.WRAP_CONTENT, GridView.LayoutParams.WRAP_CONTENT, true);
@@ -339,10 +365,12 @@ public class MainActivity extends AppCompatActivity {
         mCategoryGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (nowCategoryId != i) {
+                String chooseName = (String) ((TextView) view).getText();
+                int chooseId = mAllCategoryList.indexOf(chooseName);
+                if (nowCategoryId != chooseId) {
                     closeInputMethodAnyaway();
-                    nowCategoryId = i;
-                    mCategoryBtn.setText("分类：" + mCategoryList.get(i));
+                    nowCategoryId = chooseId;
+                    mCategoryBtn.setText("分类：" + chooseName);
                     refreshNews();
                 }
                 mCategoryPopupWindow.dismiss();
@@ -350,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
         });
         //设置“分类”按钮行为
         mCategoryBtn = (Button) findViewById(R.id.main_filter_category);
-        mCategoryBtn.setText("分类：" + "最新");
+        mCategoryBtn.setText("分类：" + firstOptionName);
         mCategoryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -358,6 +386,10 @@ public class MainActivity extends AppCompatActivity {
                 mCategoryPopupWindow.showAsDropDown(mCategoryBtn);
             }
         });
+    }
+
+    //筛选器里面的搜索模块
+    private void initFilterSearch() {
         //设置搜索模块行为
         mSearchView = (SearchView) findViewById(R.id.main_filter_search);
         mSearchView.setFocusable(true);
@@ -446,7 +478,6 @@ public class MainActivity extends AppCompatActivity {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 //这是滑动事件，需要自己判断是不是滑到接近底部
                 super.onScrolled(recyclerView, dx, dy);
-                Log.d(TAG, "onScrolledn dx = " + dx + " dy = " + dy);
                 //滑动的时候，如果输入法还开着，就把它关了。
                 if(dx != 0 || dy != 0) {
                     closeInputMethodAnyaway();
@@ -583,32 +614,77 @@ public class MainActivity extends AppCompatActivity {
 
     //设置菜单里面的东西
     private void initSetting() {
+        //自定义分类列表
+        initSettingCategory();
         //字体大小设置
         initSettingTextsize();
 
 
 
-
-
     }
+
+    //自定义分类菜单
+    private void initSettingCategory() {
+        //获取当前的分类菜单状态
+        mCategoryOptionEmerging = (RelativeLayout) findViewById(R.id.main_setting_category_emerging);
+        mCategoryOptionSpread = (ImageView) findViewById(R.id.main_setting_category_spread);
+        mCategoryOptionHidden = (LinearLayout) findViewById(R.id.main_setting_category_hidden);
+        mCategoryOptionRecView = (RecyclerView) findViewById(R.id.main_setting_category_recview);
+        mCategoryOptionBtn = (Button) findViewById(R.id.main_setting_category_gogogo);
+        //显示隐藏部分的点击事件
+        mCategoryOptionEmerging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                spreadSettingCategory();
+            }
+        });
+        //隐藏部分收回去的点击事件
+        mCategoryOptionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "设置已生效", Toast.LENGTH_SHORT).show();
+                initFilterCategory();
+                hiddenSettingCategory();
+            }
+        });
+        //按钮控制显示或收回事件
+        mCategoryOptionSpread.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mCategoryOptionHidden.getVisibility() == View.GONE) {
+                    spreadSettingCategory();
+                } else {
+                    Toast.makeText(MainActivity.this, "设置尚未生效", Toast.LENGTH_SHORT).show();
+                    hiddenSettingCategory();
+                }
+            }
+        });
+        mCategoryOptionLayoutManager = new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL);
+        mCategoryOptionRecView.setLayoutManager(mCategoryOptionLayoutManager);
+        mCategoryOptionAdapter = new SettingCategoryAdapter(mAllCategoryList);
+        mCategoryOptionRecView.setAdapter(mCategoryOptionAdapter);
+    }
+    private void spreadSettingCategory() {
+        mCategoryOptionHidden.setVisibility(View.VISIBLE);
+        mCategoryOptionSpread.setRotation(180.0f);
+    }
+    private void hiddenSettingCategory() {
+        mCategoryOptionHidden.setVisibility(View.GONE);
+        mCategoryOptionSpread.setRotation(0.0f);
+    }
+
 
     //字体大小设置
     private void initSettingTextsize() {
         mTextsizeEmerging = (RelativeLayout) findViewById(R.id.main_setting_textsize_emerging);
         mTextsizeSpread = (ImageView) findViewById(R.id.main_setting_textsize_spread);
         mTextsizeHidden = (LinearLayout) findViewById(R.id.main_setting_textsize_hidden);
+        mTextsizeBtn = (Button) findViewById(R.id.main_setting_textsize_gogogo);
         //显示隐藏部分的点击事件
         mTextsizeEmerging.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 spreadSettingTextsize();
-            }
-        });
-        //隐藏部分收回去的点击事件
-        mTextsizeHidden.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hiddenSettingTextsize();
             }
         });
         //按钮控制显示或收回事件
@@ -618,8 +694,17 @@ public class MainActivity extends AppCompatActivity {
                 if(mTextsizeHidden.getVisibility() == View.GONE) {
                     spreadSettingTextsize();
                 } else {
+                    Toast.makeText(MainActivity.this, "设置尚未生效", Toast.LENGTH_SHORT).show();
                     hiddenSettingTextsize();
                 }
+            }
+        });
+        //立即生效按钮
+        mTextsizeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "设置已生效", Toast.LENGTH_SHORT).show();
+                hiddenSettingTextsize();
             }
         });
     }

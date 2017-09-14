@@ -8,12 +8,89 @@
     android:layout_height="match_parent"
     >
 
+    <!-- 所有设置选项 -->
     <LinearLayout
         android:id="@+id/main_setting_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         >
+
+        <!-- 分类列表自定义的显示部分 -->
+        <RelativeLayout
+            android:id="@+id/main_setting_category_emerging"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:id="@+id/main_setting_category_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/category_option"
+                android:textSize="20sp"
+                android:textColor="@color/main_setting_description"
+                />
+
+            <ImageView
+                android:id="@+id/main_setting_category_spread"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:maxHeight="25dp"
+                android:adjustViewBounds="true"
+                android:src="@mipmap/ic_launcher"
+                />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/main_setting_category_hidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/main_setting_category_recview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <Button
+                    android:id="@+id/main_setting_category_gogogo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/gogogo"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:background="@color/colorPrimary"
+                    />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- 间隔 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/colorPrimaryDark"
+            />
 
         <!-- 字体设置的显示部分 -->
         <RelativeLayout
@@ -44,9 +121,6 @@
                 android:maxHeight="25dp"
                 android:adjustViewBounds="true"
                 android:src="@mipmap/ic_launcher"
-                android:text="@string/spread"
-                android:textSize="14sp"
-                android:textColor="@color/main_setting_spread"
                 />
 
         </RelativeLayout>
@@ -82,6 +156,25 @@
                 android:max="4"
                 android:progress="2"
                 />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <Button
+                    android:id="@+id/main_setting_textsize_gogogo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/gogogo"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:background="@color/colorPrimary"
+                    />
+
+            </RelativeLayout>
 
         </LinearLayout>
 
