@@ -128,7 +128,7 @@ public class DatabaseLoader{
             }
         } else {
             try {
-                item = readJsonStreamDetail(mContext.openFileInput(id));
+                item = readJsonStreamDetail(mContext.openFileInput("history" + id));
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
