@@ -16,7 +16,7 @@ import static android.content.ContentValues.TAG;
 public class NewsListFragment extends Fragment {
 
     private int category;
-    private ItemNewsAdapter itemNewsAdapter;
+    private NewsListAdpter newsListAdpter;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -40,8 +40,8 @@ public class NewsListFragment extends Fragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
         Log.d(TAG, "onViewCreated: item");
-        itemNewsAdapter = new ItemNewsAdapter(getContext());
-        recyclerView.setAdapter(itemNewsAdapter);
+        newsListAdpter = new NewsListAdpter(getContext());
+        recyclerView.setAdapter(newsListAdpter);
         Log.d(TAG, "onViewCreated: item");
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.main_swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
@@ -51,14 +51,14 @@ public class NewsListFragment extends Fragment {
                 refresh();
             }
         });
-        itemNewsAdapter.addData(this.category);
+        newsListAdpter.addData(this.category);
     }
 
     private void refresh() {
         swipeRefreshLayout.setRefreshing(true);
         Log.d(TAG, "refresh: at refresh");
-        itemNewsAdapter.clearData();
-        itemNewsAdapter.addData(this.category);
+        newsListAdpter.clearData();
+        newsListAdpter.addData(this.category);
         swipeRefreshLayout.setRefreshing(false);
     }
 

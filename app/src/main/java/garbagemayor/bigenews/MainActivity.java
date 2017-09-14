@@ -140,6 +140,6 @@ public class MainActivity extends AppCompatActivity {
                 this.deleteFile(file);
             }
         }
-                Toast.makeText(this, "已清除", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "已清除", Toast.LENGTH_SHORT).show();
     }
 }

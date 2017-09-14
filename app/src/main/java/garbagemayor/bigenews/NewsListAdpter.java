@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,25 +20,31 @@ import java.util.Vector;
 
 import static android.content.ContentValues.TAG;
 
-public class ItemNewsAdapter extends RecyclerView.Adapter<ItemNewsAdapter.ViewHolder> {
+public class NewsListAdpter extends RecyclerView.Adapter<NewsListAdpter.ViewHolder> {
 
     private Context mContext;
     private List<NewsList.ListBean> newsList = new ArrayList<>();
     private ItemNewsImageAdapter itemNewsImageAdapter = new ItemNewsImageAdapter();
     MyCallBack callback;
-//    private List<Boolean> visited = new ArrayList<>();
+    private Vector<Boolean> visited;
 
-    ItemNewsAdapter(Context context) {
+    NewsListAdpter(Context context) {
         mContext = context;
+        visited = new Vector<>();
     }
     void addData (int category) {
         callback = new MyCallBack() {
             @Override
             public void callbackCall() {
                 newsList.addAll(MainActivity.pageProvider.getNewsList().getList());
-//                for (int i = 0; i < newsList.size(); i++) {
-//                    visited.set(i, false);
-//                }
+                for (NewsList.ListBean item : newsList) {
+                    try {
+                        FileInputStream fis = mContext.openFileInput(item.getNews_ID() + ".json");
+                        visited.add(true);
+                    } catch (FileNotFoundException e) {
+                        visited.add(false);
+                    }
+                }
                 notifyDataSetChanged();
                 itemNewsImageAdapter.notifyDataSetChanged();
             }
@@ -48,6 +56,7 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<ItemNewsAdapter.ViewHo
 
     void clearData() {
         newsList.clear();
+        visited.clear();
         notifyDataSetChanged();
         itemNewsImageAdapter.notifyDataSetChanged();
     }
@@ -80,13 +89,11 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<ItemNewsAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.mItem = newsList.get(position);
         holder.mTitleView.setText(holder.mItem.getNews_Title());
-//        if(visited.get(position)) {
-//            holder.mTitleView.setTextColor(Color.RED);
-//        }
-//        File f = new File(holder.mItem.getNews_ID() + ".json");
-//        if (f.exists()) {
-//            holder.mTitleView.setTextColor(Color.RED);
-//        }
+        if(visited.get(position)) {
+            holder.mTitleView.setTextColor(Color.RED);
+        } else {
+            holder.mTitleView.setTextColor(Color.GRAY);
+        }
         holder.mIntroView.setText(holder.mItem.getNews_Intro());
         String url = holder.mItem.getNews_Pictures();
         if (!url.equals("")) {
@@ -108,8 +115,8 @@ public class ItemNewsAdapter extends RecyclerView.Adapter<ItemNewsAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
-//                holder.mTitleView.setTextColor(Color.RED);
-//                visited.set(position, true);
+                holder.mTitleView.setTextColor(Color.RED);
+                visited.set(position, true);
                 Intent intent = new Intent(context, NewsDetailActivity.class);
                 intent.putExtra("category", 0);
                 intent.putExtra("id", holder.mItem.getNews_ID());
