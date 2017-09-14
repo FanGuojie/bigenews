@@ -23,6 +23,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -122,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mTextsizeBtn;
     //清除缓存
     private Button mClearHistoryBtn;
+    //夜间模式
+    private CheckBox mNightstyleCheckBox;
 
 
 
@@ -145,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
         initHomepage();
         //历史模式需要的东西
         initHistory();
-
+        //收藏夹需要的东西
+        initFavorite();
         //设置菜单里面的东西
         initSetting();
     }
@@ -216,6 +221,11 @@ public class MainActivity extends AppCompatActivity {
 
     //侧滑菜单里的按钮的行为
     private void initNavigationView() {
+        //夜间模式
+        findViewById(R.id.nav_view)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
         initIncludeMode();
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setCheckedItem(R.id.nav_homepage);
@@ -442,6 +452,11 @@ public class MainActivity extends AppCompatActivity {
 
     //新闻显示模块
     private void initShowNews() {
+        //夜间模式
+        findViewById(R.id.main_news_list)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
         //RecyclerView里面初始化
         mPageItemRecView = (RecyclerView) findViewById(R.id.main_news_list);
         mNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
@@ -461,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
 //                    db.addHistory(pageItem);
                     SharedPreferences sharedPreferences = getSharedPreferences("visited", Activity.MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(pageItem.getTitle(), true).apply();
-                    ((TextView) view.findViewById(R.id.news_title)).setTextColor(getResources().getColor(R.color.main_newscard_title_visited));
+                    ((TextView) view.findViewById(R.id.news_title)).setTextColor(getResources().getColor(R.color.daytime_title_visited));
                     startActivity(intent);
                 }
             }
@@ -580,6 +595,13 @@ public class MainActivity extends AppCompatActivity {
 
     //历史模式需要的东西
     private void initHistory() {
+        //夜间模式
+        findViewById(R.id.main_history_list)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+        //数据库
+        db = new DatabaseLoader(this.getBaseContext());
         mHistoryRecView = (RecyclerView) findViewById(R.id.main_history_list);
         mHistoryNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mHistoryRecView.setLayoutManager(mHistoryNewsLayoutManager);
@@ -618,16 +640,30 @@ public class MainActivity extends AppCompatActivity {
         mHistoryRecView.setAdapter(mHistoryNewsAdapter);
     }
 
+    //收藏夹的东西
+    private void initFavorite() {
+        //夜间模式
+        findViewById(R.id.main_favorite_list)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+    }
+
     //设置菜单里面的东西
     private void initSetting() {
+        //夜间模式
+        findViewById(R.id.main_setting_list)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
         //自定义分类列表
         initSettingCategory();
         //字体大小设置
         initSettingTextsize();
         //清除缓存按钮
         initSettingClear();
-
-
+        //夜间模式切换
+        initSettingNightstyle();
     }
 
     //自定义分类菜单
@@ -738,23 +774,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void initSettingNightstyle() {
+        SharedPreferences sharedPreferences = getSharedPreferences("setting", Activity.MODE_PRIVATE);
+        mNightstyleCheckBox = (CheckBox) findViewById(R.id.main_setting_nightstyle_checkbox);
+        mNightstyleCheckBox.setChecked(sharedPreferences.getBoolean("NightStyleOn", false));
+        mNightstyleCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isOn) {
+                SharedPreferences sharedPreferences = getSharedPreferences("setting", Activity.MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean("NightStyleOn", isOn).apply();
+                nightstyleHasBeenChanged();
+            }
+        });
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private void nightstyleHasBeenChanged() {
+        /*
+        int backgound;
+        int textTitle;
+        int textTitleV;
+        int textContent;
+        if(getSharedPreferences("setting", Activity.MODE_PRIVATE).getBoolean("NightStyleOn", false)) {
+            backgound = getResources().getColor(R.color.daytime_background);
+            textTitle = getResources().getColor(R.color.daytime_title);
+            textTitleV = getResources().getColor(R.color.daytime_title_visited);
+            textContent = getResources().getColor(R.color.daytime_content);
+        } else {
+            backgound = getResources().getColor(R.color.night_background);
+            textTitle = getResources().getColor(R.color.night_title);
+            textTitleV = getResources().getColor(R.color.night_title_visited);
+            textContent = getResources().getColor(R.color.night_content);
+        }
+        */
+        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
 

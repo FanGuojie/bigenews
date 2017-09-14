@@ -3,29 +3,18 @@ package garbagemayor.bigenews;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bm.library.PhotoView;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import garbagemayor.bigenews.newssrc.PageItem;
 
@@ -94,7 +83,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     public NewsAdapter(List<PageItem> newsList) {
         mNewsList = newsList;
-
     }
 
     @Override
@@ -104,22 +92,23 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        //夜间模式
+        holder.mCardView
+                .setBackgroundColor(mContext.getResources().getColor(
+                        mContext.getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+        //看过的变灰
         PageItem pageItem = mNewsList.get(position);
         holder.mTitleTextView.setText(pageItem.getTitle());
-
-
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("visited", Activity.MODE_PRIVATE);
         Log.d(TAG, pageItem.getTitle() + position);
         if(sharedPreferences.getBoolean(pageItem.getTitle(), false)) {
             Log.d(TAG, "RED");
-            holder.mTitleTextView.setTextColor(mContext.getResources().getColor(R.color.main_newscard_title_visited));
+            holder.mTitleTextView.setTextColor(mContext.getResources().getColor(R.color.daytime_title_visited));
         } else {
-            holder.mTitleTextView.setTextColor(mContext.getResources().getColor(R.color.main_newscard_title));
+            holder.mTitleTextView.setTextColor(mContext.getResources().getColor(R.color.daytime_title));
 
         }
-
-
-
         holder.mIntroTextView.setText(pageItem.getIntro());
         holder.mTimeTextView.setText(pageItem.getTime());
         //加载小图列表RecyclerView的属性

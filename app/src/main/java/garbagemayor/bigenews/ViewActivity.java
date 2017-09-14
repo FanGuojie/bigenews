@@ -1,5 +1,6 @@
 package garbagemayor.bigenews;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -54,6 +55,14 @@ public class ViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.news_detail_activity_layout);
+
+        //夜间模式
+
+        findViewById(R.id.news_detail_linear)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+
 
         CircleButton btdl = (CircleButton) findViewById(R.id.button_download);
         CircleButton btfavor = (CircleButton) findViewById(R.id.button_favor);
@@ -111,7 +120,7 @@ public class ViewActivity extends AppCompatActivity {
         btshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {Intent intent1=new Intent(Intent.ACTION_SEND);
-                intent1.putExtra(Intent.EXTRA_TEXT, news.getTitle() + "\n" + "http://166.111.68.66:2042/news/action/query/NewsItem?newsId=" + id);
+                intent1.putExtra(Intent.EXTRA_TEXT, news.getTitle() + "\n" + news.getURL());
                 intent1.setType("text/plain");
                 startActivity(Intent.createChooser(intent1,"share"));
             }

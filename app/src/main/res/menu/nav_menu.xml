@@ -7,25 +7,27 @@
 
         <item
             android:id="@+id/nav_homepage"
-            android:icon="@drawable/ic_nav_homepage"
+            android:icon="@drawable/homepage"
             android:title="@string/homepage"
             />
         <item
             android:id="@+id/nav_history"
-            android:icon="@drawable/ic_nav_history"
+            android:icon="@drawable/history"
             android:title="@string/history"
             />
         <item
             android:id="@+id/nav_favorite"
-            android:icon="@drawable/ic_nav_homepage"
+            android:icon="@drawable/favorite"
             android:title="@string/favorite"
             />
         <item
             android:id="@+id/nav_setting"
+            android:icon="@drawable/setting"
             android:title="@string/setting"
             />
         <item
             android:id="@+id/nav_quit"
+            android:icon="@drawable/quit"
             android:title="@string/quit"
             />
     </group>

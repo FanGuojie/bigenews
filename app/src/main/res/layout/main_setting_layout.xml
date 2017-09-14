@@ -1,76 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 给LinearLayout外面套一个ScrollView使它可以滚动 -->
-<ScrollView
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:id="@+id/main_setting_linear"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
 
-    <!-- 所有设置选项 -->
-    <LinearLayout
-        android:id="@+id/main_setting_list"
+    >
+    <!-- 给LinearLayout外面套一个ScrollView使它可以滚动 -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="match_parent"
         >
 
-        <!-- 分类列表自定义的显示部分 -->
-        <RelativeLayout
-            android:id="@+id/main_setting_category_emerging"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-
-            <TextView
-                android:id="@+id/main_setting_category_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="@string/category_option"
-                android:textSize="20sp"
-                android:textColor="@color/main_setting_description"
-                />
-
-            <ImageView
-                android:id="@+id/main_setting_category_spread"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:maxHeight="25dp"
-                android:adjustViewBounds="true"
-                android:src="@mipmap/ic_launcher"
-                />
-
-        </RelativeLayout>
-
+        <!-- 所有设置选项 -->
         <LinearLayout
-            android:id="@+id/main_setting_category_hidden"
+            android:id="@+id/main_setting_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone"
             >
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/main_setting_category_recview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                />
-
+            <!-- 分类列表自定义的显示部分 -->
             <RelativeLayout
+                android:id="@+id/main_setting_category_emerging"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
 
+                <TextView
+                    android:id="@+id/main_setting_category_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/category_option"
+                    android:textSize="20sp"
+                    android:textColor="@color/main_setting_description"
+                    />
+
+                <ImageView
+                    android:id="@+id/main_setting_category_spread"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:maxHeight="25dp"
+                    android:adjustViewBounds="true"
+                    android:src="@mipmap/ic_launcher"
+                    />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/main_setting_category_hidden"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                >
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/main_setting_category_recview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <Button
+                        android:id="@+id/main_setting_category_gogogo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/gogogo"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:background="@color/colorPrimary"
+                        />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <!-- 间隔 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/colorPrimaryDark"
+                />
+
+            <!-- 字体设置的显示部分 -->
+            <RelativeLayout
+                android:id="@+id/main_setting_textsize_emerging"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <TextView
+                    android:id="@+id/main_setting_textsize_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/textsize"
+                    android:textSize="20sp"
+                    android:textColor="@color/main_setting_description"
+                    />
+
+                <ImageView
+                    android:id="@+id/main_setting_textsize_spread"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:maxHeight="25dp"
+                    android:adjustViewBounds="true"
+                    android:src="@mipmap/ic_launcher"
+                    />
+
+            </RelativeLayout>
+
+            <!-- 字体设置的隐藏部分 -->
+            <LinearLayout
+                android:id="@+id/main_setting_textsize_hidden"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                >
+
+                <TextView
+                    android:id="@+id/main_setting_textsize_sample"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/sample_sentence"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/black"
+                    />
+
+                <SeekBar
+                    android:id="@+id/main_setting_textsize_seekbar"
+                    android:layout_width="360dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_gravity="center_horizontal"
+                    android:max="4"
+                    android:progress="2"
+                    />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <Button
+                        android:id="@+id/main_setting_textsize_gogogo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/gogogo"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:background="@color/colorPrimary"
+                        />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <!-- 间隔 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/colorPrimaryDark"
+                />
+
+
+            <!-- 字体设置的显示部分 -->
+            <RelativeLayout
+                android:id="@+id/main_setting_clear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <TextView
+                    android:id="@+id/main_setting_clear_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/clear_history"
+                    android:textSize="20sp"
+                    android:textColor="@color/main_setting_description"
+                    />
+
                 <Button
-                    android:id="@+id/main_setting_category_gogogo"
+                    android:id="@+id/main_setting_clear_gogogo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -83,143 +226,61 @@
 
             </RelativeLayout>
 
-        </LinearLayout>
-
-        <!-- 间隔 -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/colorPrimaryDark"
-            />
-
-        <!-- 字体设置的显示部分 -->
-        <RelativeLayout
-            android:id="@+id/main_setting_textsize_emerging"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-
-            <TextView
-                android:id="@+id/main_setting_textsize_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="@string/textsize"
-                android:textSize="20sp"
-                android:textColor="@color/main_setting_description"
+            <!-- 间隔 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/colorPrimaryDark"
                 />
 
-            <ImageView
-                android:id="@+id/main_setting_textsize_spread"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:maxHeight="25dp"
-                android:adjustViewBounds="true"
-                android:src="@mipmap/ic_launcher"
-                />
-
-        </RelativeLayout>
-
-        <!-- 字体设置的隐藏部分 -->
-        <LinearLayout
-            android:id="@+id/main_setting_textsize_hidden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            >
-
-            <TextView
-                android:id="@+id/main_setting_textsize_sample"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/sample_sentence"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                />
-
-            <SeekBar
-                android:id="@+id/main_setting_textsize_seekbar"
-                android:layout_width="360dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_gravity="center_horizontal"
-                android:max="4"
-                android:progress="2"
-                />
-
+            <!-- 字体设置的显示部分 -->
             <RelativeLayout
+                android:id="@+id/main_setting_nightstyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
 
-                <Button
-                    android:id="@+id/main_setting_textsize_gogogo"
+                <TextView
+                    android:id="@+id/main_setting_nightstyle_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_margin="10dp"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:text="@string/gogogo"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
-                    android:background="@color/colorPrimary"
+                    android:text="@string/nightstyle"
+                    android:textSize="20sp"
+                    android:textColor="@color/main_setting_description"
+                    />
+
+                <CheckBox
+                    android:id="@+id/main_setting_nightstyle_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:checked="false"
                     />
 
             </RelativeLayout>
 
+            <!-- 间隔 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/colorPrimaryDark"
+                />
+
+            <!-- 填满 -->
+            <LinearLayout
+                android:id="@+id/main_setting_fill"
+                android:layout_width="match_parent"
+                android:layout_height="800dp"
+                android:orientation="vertical"
+                />
+
         </LinearLayout>
 
-        <!-- 间隔 -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/colorPrimaryDark"
-            />
+    </ScrollView>
 
-
-        <!-- 字体设置的显示部分 -->
-        <RelativeLayout
-            android:id="@+id/main_setting_clear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
-
-            <TextView
-                android:id="@+id/main_setting_clear_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:text="@string/clear_history"
-                android:textSize="20sp"
-                android:textColor="@color/main_setting_description"
-                />
-
-            <Button
-                android:id="@+id/main_setting_clear_gogogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:text="@string/gogogo"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:background="@color/colorPrimary"
-                />
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

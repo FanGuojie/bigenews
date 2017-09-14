@@ -1,5 +1,6 @@
 package garbagemayor.bigenews;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -21,14 +23,12 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.welcome_activity_layout);
 
         //隐藏状态栏
-        Log.d(TAG, "隐藏状态栏");
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //设置滚动条属性
         mTextView = (TextView) findViewById(R.id.adv_text);
 
         //欢迎界面持续3秒
-        Log.d(TAG, "等待3秒");
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -37,6 +37,11 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         };
         mHandler.sendEmptyMessageDelayed(0,500);
+
+        findViewById(R.id.welcome_relative)
+                .setBackgroundColor(getResources().getColor(
+                        getSharedPreferences("setting", Activity.MODE_PRIVATE)
+                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
     }
 
     public void getHome(){
