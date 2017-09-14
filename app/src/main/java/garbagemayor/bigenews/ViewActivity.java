@@ -119,7 +119,7 @@ public class ViewActivity extends AppCompatActivity {
         btshare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {Intent intent1=new Intent(Intent.ACTION_SEND);
-                intent1.putExtra(Intent.EXTRA_TEXT, news.getTitle() + "\n" + "http://166.111.68.66:2042/news/action/query/NewsItem?newsId=" + id);
+                intent1.putExtra(Intent.EXTRA_TEXT, news.getTitle() + "\n" + news.getURL());
                 intent1.setType("text/plain");
                 startActivity(Intent.createChooser(intent1,"share"));
             }

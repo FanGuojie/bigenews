@@ -13,6 +13,9 @@ public class NewsItem {
     public String getId() {
         return news_ID;
     }
+    public String getURL() {
+        return news_URL;
+    }
     public String getTitle() {
         return news_Title;
     }
