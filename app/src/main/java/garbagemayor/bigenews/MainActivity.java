@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
      *  收藏模式
      */
     private View mFavoriteInclude;
+    private RecyclerView mFavoriteRecView;
+    private StaggeredGridLayoutManager mFavoriteNewsLayoutManager;
+    private NewsAdapter mFavoriteNewsAdapter;
 
     /*
      *  设置模式
@@ -225,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.nav_view)
                 .setBackgroundColor(getResources().getColor(
                         getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
         initIncludeMode();
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setCheckedItem(R.id.nav_homepage);
@@ -266,12 +269,12 @@ public class MainActivity extends AppCompatActivity {
                     //进入收藏夹
                     case R.id.nav_favorite:
                         mToolBarText.setText("：收藏");
-                        Toast.makeText(MainActivity.this, "这部分代码还没写", Toast.LENGTH_SHORT).show();
                         mHomepageInclude.setVisibility(View.GONE);
                         mHistoryInclude.setVisibility(View.GONE);
                         mFavoriteInclude.setVisibility(View.VISIBLE);
                         mSettingInclude.setVisibility(View.GONE);
                         mBackToTopFAB.setVisibility(View.GONE);
+                        loadFavorite();
                         mDrawerLayout.closeDrawers();
                         break;
                     //进入设置界面
@@ -456,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_news_list)
                 .setBackgroundColor(getResources().getColor(
                         getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
         //RecyclerView里面初始化
         mPageItemRecView = (RecyclerView) findViewById(R.id.main_news_list);
         mNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
@@ -500,6 +503,18 @@ public class MainActivity extends AppCompatActivity {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 //这是滑动事件，需要自己判断是不是滑到接近底部
                 super.onScrolled(recyclerView, dx, dy);
+                //旋转悬浮按钮
+                int firstPosList[] = mNewsLayoutManager.findFirstVisibleItemPositions(null);
+                int firstPos = Integer.MAX_VALUE;
+                for (int i = 0; i < firstPosList.length; i++) {
+                    if(firstPos > firstPosList[i]) {
+                        firstPos = firstPosList[i];
+                    }
+                }
+                View firstChildView = mNewsLayoutManager.findViewByPosition(firstPos);
+                int itemHeight = firstChildView.getHeight() * firstPos - firstChildView.getTop();
+                float rotateAngle = 90.0f * itemHeight / mPageItemRecView.getHeight();
+                mBackToTopFAB.setRotation(rotateAngle);
                 //滑动的时候，如果输入法还开着，就把它关了。
                 if(dx != 0 || dy != 0) {
                     closeInputMethodAnyaway();
@@ -587,6 +602,7 @@ public class MainActivity extends AppCompatActivity {
         mBackToTopFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mBackToTopFAB.setRotation(0);
                 closeInputMethodAnyaway();
                 mPageItemRecView.scrollToPosition(0);
             }
@@ -599,7 +615,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_history_list)
                 .setBackgroundColor(getResources().getColor(
                         getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
         //数据库
         db = new DatabaseLoader(this.getBaseContext());
         mHistoryRecView = (RecyclerView) findViewById(R.id.main_history_list);
@@ -609,20 +625,41 @@ public class MainActivity extends AppCompatActivity {
 
     //每次打开历史模式的时候要重新加载历史内容
     private void loadHistory() {
-        mHistoryNewsAdapter = new NewsAdapter(db.history);
+        db.updateHistory();
+        if(mHistoryNewsAdapter == null) {
+            mHistoryNewsAdapter = new NewsAdapter(db.history);
+        }
+        mHistoryNewsAdapter.notifyDataSetChanged();
         mHistoryNewsAdapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int postion) {
                 //点击第postion条新闻
                 closeInputMethodAnyaway();
-                PageItem pageItem = db.history.get(postion);
-                if (pageItem != null) {
-                    //Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                final String title = db.history.get(postion).getTitle();
+                final PageItem[] pageItem = new PageItem[1];
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            PagePlus p = new PagePlus(title, 1, sizeOfPage);
+                            pageItem[0] = p.cont[0];
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t.start();
+                try {
+                    t.join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (pageItem[0] != null) {
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
-                    intent.putExtra("id", pageItem.getId());
-                    intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
-//                    db.addHistory(pageItem);
+                    intent.putExtra("id", pageItem[0].getId());
+                    intent.putExtra("pictures", pageItem[0].getImageUrlList().toArray());
                     startActivity(intent);
+
                 }
             }
         });
@@ -637,7 +674,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        mHistoryRecView.setAdapter(mHistoryNewsAdapter);
+        if(mHistoryRecView.getAdapter() == null) {
+            mHistoryRecView.setAdapter(mHistoryNewsAdapter);
+        }
     }
 
     //收藏夹的东西
@@ -646,7 +685,69 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_favorite_list)
                 .setBackgroundColor(getResources().getColor(
                         getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
+        //数据库
+        db = new DatabaseLoader(this.getBaseContext());
+        mFavoriteRecView = (RecyclerView) findViewById(R.id.main_favorite_list);
+        mFavoriteNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        mFavoriteRecView.setLayoutManager(mFavoriteNewsLayoutManager);
+    }
+
+    //每次打开收藏模式的时候要重新加载历史内容
+    private void loadFavorite() {
+        db.updateFavorite();
+        Log.d(TAG, "size = " + db.favorite.size());
+        if(mFavoriteNewsAdapter == null) {
+            mFavoriteNewsAdapter = new NewsAdapter(db.favorite);
+        }
+        mFavoriteNewsAdapter.notifyDataSetChanged();
+        mFavoriteNewsAdapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int postion) {
+                //点击第postion条新闻
+                closeInputMethodAnyaway();
+                final String title = db.favorite.get(postion).getTitle();
+                final PageItem[] pageItem = new PageItem[1];
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            PagePlus p = new PagePlus(title, 1, sizeOfPage);
+                            pageItem[0] = p.cont[0];
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t.start();
+                try {
+                    t.join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (pageItem[0] != null) {
+                    Intent intent = new Intent(MainActivity.this, ViewActivity.class);
+                    intent.putExtra("id", pageItem[0].getId());
+                    intent.putExtra("pictures", pageItem[0].getImageUrlList().toArray());
+                    startActivity(intent);
+
+                }
+            }
+        });
+        mFavoriteNewsAdapter.setOnItemLongClickListener(new NewsAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int postion) {
+                //长按第postion条新闻
+                closeInputMethodAnyaway();
+                PageItem pageItem = db.favorite.get(postion);
+                if (pageItem != null) {
+                    Toast.makeText(MainActivity.this, "长按：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        if(mFavoriteRecView.getAdapter() == null) {
+            mFavoriteRecView.setAdapter(mFavoriteNewsAdapter);
+        }
     }
 
     //设置菜单里面的东西
@@ -655,7 +756,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.main_setting_list)
                 .setBackgroundColor(getResources().getColor(
                         getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
         //自定义分类列表
         initSettingCategory();
         //字体大小设置
@@ -770,7 +871,7 @@ public class MainActivity extends AppCompatActivity {
                 sharedPreferences.edit().clear().apply();
                 String[] filelist = fileList();
                 for (String file : filelist) {
-                    if (file.contains("2016")) {
+                    if (file.contains("history")) {
                         Log.d(TAG, "onClick: " + file);
                         deleteFile(file);
                     }

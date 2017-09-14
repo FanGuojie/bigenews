@@ -61,7 +61,7 @@ public class ViewActivity extends AppCompatActivity {
         findViewById(R.id.news_detail_linear)
                 .setBackgroundColor(getResources().getColor(
                         getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
 
 
         CircleButton btdl = (CircleButton) findViewById(R.id.button_download);
@@ -113,7 +113,12 @@ public class ViewActivity extends AppCompatActivity {
         btfavor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(ViewActivity.this, "已收藏", Toast.LENGTH_SHORT).show();
+                try {
+                    DatabaseLoader.writeJsonStream(openFileOutput("favorite" + id, Context.MODE_PRIVATE), news);
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
             }
         });
 

@@ -10,7 +10,7 @@
     <string name="homepage">首页</string>
     <string name="history">历史</string>
     <string name="favorite">收藏</string>
-    <string name="unregistered">未登录</string>
+    <string name="unregistered">已登录</string>
     <string name="back_to_top">回到顶部</string>
     <string name="welcome">Garbagemayor presents&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Welcome to 702B</string>
     <string name="category">分类</string>

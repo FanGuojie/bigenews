@@ -70,14 +70,13 @@
         <!-- 一个悬浮按钮，回到顶部，说不定还可以放一大串按钮 -->
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/main_homepage_floating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_top"
-            app:elevation="8dp"
+            android:src="@mipmap/back_to_top"
             app:pressedTranslationZ="6dp"
-            app:backgroundTint="#BF000040"
+            app:backgroundTint="#BF5050CF"
             app:rippleColor="#000040"
             />
 

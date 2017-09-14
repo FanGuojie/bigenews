@@ -59,6 +59,9 @@ public class PageItem {
     }
     public String getTime() {
         try {
+            if(news_Time.contains("年")) {
+                return news_Time;
+            }
             int year = Integer.parseInt(news_Time.substring(0, 4));
             int month = Integer.parseInt(news_Time.substring(4, 6));
             int day = Integer.parseInt(news_Time.substring(6, 8));
@@ -88,14 +91,22 @@ public class PageItem {
 
     public List<String> getImageUrlList() {
         List<String> urlList = new ArrayList<>();
+        if(news_Pictures == null) {
+            news_Pictures = "";
+        }
         String[] urlArray = news_Pictures.split(";| |\n|\t|\r");
         for(String url: urlArray) {
-            urlList.add(url);
+            if(url.length() > 1) {
+                urlList.add(url);
+            }
         }
         return urlList;
     }
 
     private static String prefixTrim(String str) {
+        if(str == null ){
+            str = "";
+        }
         str = str.replaceAll("　","  ");
         str = str.replaceAll("\t","  ");
         for (int i = 0; i < str.length(); i++) {

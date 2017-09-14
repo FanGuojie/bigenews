@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,113 +36,80 @@ public class DatabaseLoader{
 
     Context mContext;
 
-//    private Map<String, PageItem> page;
-//    private Map<String, NewsItem> news;
     public List<PageItem> history;
+    public List<PageItem> favorite;
     public List<PageItem> history_list;
     public NewsItem item;
     private static boolean online;
     private final String fileName = "list.json";
 
+    private int network_delay = 5000;
+
 
     public DatabaseLoader(Context context) {
         this.mContext = context;
         history = new ArrayList<>();
-//        page = new HashMap<>();
-//        news = new HashMap<>();
+        favorite = new ArrayList<>();
+    }
+
+    public void updateHistory() {
         String[] filelist = mContext.fileList();
+        history.clear();
         for (String file : filelist) {
-            if (file.contains("2016")) {
-//                Toast.makeText(mContext, file, Toast.LENGTH_SHORT).show();
-                history.add(new PageItem(queryNews(file)));
+            if (file.contains("history")) {
+                history.add(new PageItem(queryNews(file.substring(7))));
             }
         }
-//        String DBName = context.getApplicationInfo().dataDir + "/databases/test.db";//android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "test.db";
-//        File f_=new File(DBName);
-//            if(!f_.getParentFile().exists()){
-//                Log.d("DBService", "文件夹不存在，新建一个");
-//                f_.getParentFile().mkdirs();
-//            }
-//        db = SQLiteDatabase.openOrCreateDatabase(DBName, null);
-//        db.execSQL("CREATE TABLE IF NOT EXISTS History (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT, content TEXT)");
-//        Cursor cursor = db.query ("History",null,null,null,null,null,null);
-//        if(cursor.moveToFirst()) {
-//            do {
-//                int id = cursor.getInt(cursor.getColumnIndex("id"));
-//                String type = cursor.getString(cursor.getColumnIndex("type"));
-//                String content = cursor.getString(cursor.getColumnIndex("content"));
-//                if (type == "page") {
-//                    Gson gson = new GsonBuilder().create();
-//                    PageItem p = gson.fromJson(content, PageItem.class);
-//                    page.put(p.getId(), p);
-//                    history.add(p);
-//                } else {
-//                    Gson gson = new GsonBuilder().create();
-//                    NewsItem n = gson.fromJson(content, NewsItem.class);
-//                    news.put(n.getId(), n);
-//                }
-//            }while (cursor.moveToNext());
-//        }
-
+    }
+    public void updateFavorite() {
+        String[] filelist = mContext.fileList();
+        favorite.clear();
+        for (String file : filelist) {
+            if (file.contains("favorite")) {
+                favorite.add(new PageItem(queryNews(file.substring(8))));
+            }
+        }
     }
 
 
-//
-//    public void storeNews(PageItem pageItem) {
-//        page.put(pageItem.getId(), pageItem);
-//        Gson gson = new Gson();
-//        String str = gson.toJson(pageItem);
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put("type", "page");
-//        contentValues.put("content", str);
-//        db.insert("History", null, contentValues);
-//    }
-//
-//    public void storeNewsDetail(NewsItem newsItem) {
-//        if (news.containsKey(newsItem.getId()))
-//            return;
-//        news.put(newsItem.getId(), newsItem);
-//        Gson gson = new Gson();
-//        String str = gson.toJson(newsItem);
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put("type", "news");
-//        contentValues.put("content", str);
-//        db.insert("History", null, contentValues);
-//    }
-//
-//    public PageItem queryPage(String id) {
-//        if (page.containsKey(id))
-//            return page.get(id);
-//        else
-//            return null;
-//    }
-
-    public NewsItem queryNews(final String id) {
-        online = false;
-        Thread thread = new Thread() {
+    public static boolean isNetworkAvailable(final Context context) {
+        final boolean[] flag = {false};
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
-                        DatabaseLoader.online = true;
+                ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (cm == null) {
+                } else {
+                    //如果仅仅是用来判断网络连接
+                    //则可以使用 cm.getActiveNetworkInfo().isAvailable();
+                    NetworkInfo[] info = cm.getAllNetworkInfo();
+                    if (info != null) {
+                        for (int i = 0; i < info.length; i++) {
+                            if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+                                flag[0] = true;
+                                return;
+                            }
+                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-        };
+        });
         thread.start();
         try {
             thread.join();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (DatabaseLoader.online) {
+        return flag[0];
+    }
+
+    public NewsItem queryNews(final String id) {
+        if (isNetworkAvailable(mContext)) {
             Thread t = new Thread() {
                 @Override
                 public void run() {
                     try {
-                            item = PagePlus.getNewsItem(id);
+                        item = PagePlus.getNewsItem(id);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -153,7 +122,7 @@ public class DatabaseLoader{
                 e.printStackTrace();
             }
             try {
-               writeJsonStream(mContext.openFileOutput(item.getId(), Context.MODE_PRIVATE), item);
+                writeJsonStream(mContext.openFileOutput("history" + item.getId(), Context.MODE_PRIVATE), item);
             } catch (Exception ee) {
                 ee.printStackTrace();
             }
@@ -168,26 +137,8 @@ public class DatabaseLoader{
     }
 
     public List<PageItem> queryPage(final int i, final int sizeOfPage) {
-        online = false;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
-                        DatabaseLoader.online = true;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-        try {
-            thread.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (DatabaseLoader.online) {
+        if (isNetworkAvailable(mContext)) {
+            Log.d(TAG, "online");
             Thread t = new Thread() {
                 @Override
                 public void run() {
@@ -211,6 +162,7 @@ public class DatabaseLoader{
                 ee.printStackTrace();
             }
         } else {
+            Log.d(TAG, "offline");
             try {
                 history_list = readJsonStream(mContext.openFileInput(fileName));
             } catch (Exception ee) {
@@ -221,26 +173,7 @@ public class DatabaseLoader{
     }
 
     public List<PageItem> queryPage(final int nowCategoryId, final int i, final int sizeOfPage) {
-        online = false;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
-                        DatabaseLoader.online = true;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-        try {
-            thread.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (DatabaseLoader.online) {
+        if (isNetworkAvailable(mContext)) {
             Thread t = new Thread() {
                 @Override
                 public void run() {
@@ -274,26 +207,7 @@ public class DatabaseLoader{
     }
 
     public List<PageItem> queryPage(final String nowSearchText, final int i, final int sizeOfPage) {
-        online = false;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
-                        DatabaseLoader.online = true;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-        try {
-            thread.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (DatabaseLoader.online) {
+        if (isNetworkAvailable(mContext)) {
             Thread t = new Thread() {
                 @Override
                 public void run() {
@@ -327,26 +241,7 @@ public class DatabaseLoader{
     }
 
     public List<PageItem> queryPage(final String nowSearchText, final int nowCategoryId, final int i, final int sizeOfPage) {
-        online = false;
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    if (Inet4Address.getByName("166.111.68.66").isReachable(200)) {
-                        DatabaseLoader.online = true;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();
-        try {
-            thread.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (DatabaseLoader.online) {
+        if (isNetworkAvailable(mContext)) {
             Thread t = new Thread() {
                 @Override
                 public void run() {
@@ -393,7 +288,7 @@ public class DatabaseLoader{
         return messages;
     }
 
-    private void writeJsonStream(OutputStream out, List<PageItem> messages) throws IOException {
+    public static void writeJsonStream(OutputStream out, List<PageItem> messages) throws IOException {
         JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
         Gson gson = new Gson();
         writer.setIndent("  ");
@@ -411,7 +306,7 @@ public class DatabaseLoader{
         return messages;
     }
 
-    private void writeJsonStream(OutputStream out, NewsItem messages) throws IOException {
+    public static void writeJsonStream(OutputStream out, NewsItem messages) throws IOException {
         JsonWriter writer = new JsonWriter(new OutputStreamWriter(out, "UTF-8"));
         Gson gson = new Gson();
         gson.toJson(messages, NewsItem.class, writer);

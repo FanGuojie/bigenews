@@ -13,22 +13,25 @@ public class NewsItem {
     private String news_Pictures;
 
     public String getId() {
-        return news_ID;
+        return news_ID == null ? "" : news_ID;
     }
     public String getURL() {
-        return news_URL;
+        return news_URL == null ? "" : news_URL;
     }
     public String getTitle() {
-        return news_Title;
+        return news_Title == null ? "" : news_Title;
     }
     public String getContent() {
-        return news_Content;
+        return news_Content == null ? "" : news_Content;
     }
     public String getAuthor() {
-        return news_Author;
+        return news_Author == null ? "" : news_Author;
     }
     public String getTime() {
         try {
+            if(news_Time.contains("年")) {
+                return news_Time;
+            }
             int year = Integer.parseInt(news_Time.substring(0, 4));
             int month = Integer.parseInt(news_Time.substring(4, 6));
             int day = Integer.parseInt(news_Time.substring(6, 8));
@@ -38,9 +41,11 @@ public class NewsItem {
         }
     }
     public String getJournal() {
-        return news_Journal;
+        return news_Journal == null ? "" : news_Journal;
     }
-    public String getPictures() {return news_Pictures; }
+    public String getPictures() {
+        return news_Pictures == null ? "" : news_Pictures;
+    }
 
 
 }

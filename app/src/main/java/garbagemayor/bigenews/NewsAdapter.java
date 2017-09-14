@@ -96,7 +96,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         holder.mCardView
                 .setBackgroundColor(mContext.getResources().getColor(
                         mContext.getSharedPreferences("setting", Activity.MODE_PRIVATE)
-                                .getBoolean("NightStyleOn", false)?R.color.night_background:R.color.daytime_background));
+                                .getBoolean("NightStyleOn", false)? R.color.night_background: R.color.daytime_background));
         //看过的变灰
         PageItem pageItem = mNewsList.get(position);
         holder.mTitleTextView.setText(pageItem.getTitle());
