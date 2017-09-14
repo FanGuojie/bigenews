@@ -7,4 +7,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 收藏新闻浏览部分 -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_favorite_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="horizontal"
+        />
+
 </LinearLayout>

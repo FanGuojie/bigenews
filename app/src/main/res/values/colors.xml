@@ -3,14 +3,22 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="main_filter_text_color_off">#CFCFCF</color>
-    <color name="main_newscard_title">#000080</color>
-    <color name="main_newscard_title_visited">#A0A0C0</color>
-    <color name="main_newscard_time">#9F9F9F</color>
+
+    <color name="daytime_background">#FAFAFA</color>
+    <color name="daytime_title">#000080</color>
+    <color name="daytime_title_visited">#A0A0C0</color>
+    <color name="daytime_content">#000000</color>
+
+    <color name="night_background">#404040</color>
+    <color name="night_title">#3030FF</color>
+    <color name="night_title_visited">#1010A0</color>
+    <color name="night_content">#303030</color>
+
     <color name="popup_window_background_color">#DF303F9F</color>
+
     <color name="view_big_picture_background">#CF000000</color>
+
     <color name="search_view_alive_backgound">#6C79D2</color>
     <color name="main_setting_description">#000080</color>
     <color name="main_setting_spread">#000080</color>
-
 </resources>

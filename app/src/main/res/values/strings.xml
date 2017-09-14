@@ -21,5 +21,6 @@
     <string name="category_option">筛选分类</string>
     <string name="gogogo">立即生效</string>
     <string name="clear_history">清除缓存</string>
+    <string name="nightstyle">夜间模式</string>
 
 </resources>
