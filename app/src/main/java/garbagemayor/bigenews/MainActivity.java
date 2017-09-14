@@ -12,7 +12,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -40,6 +39,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import garbagemayor.bigenews.newssrc.DatabaseLoader;
 import garbagemayor.bigenews.newssrc.PagePlus;
 import garbagemayor.bigenews.newssrc.PageItem;
 
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private List<PageItem> mNewsList = new ArrayList<>();
     //新闻加载器部分
     private boolean isLoading = false;
-    private PagePlus mPage;
+    private List<PageItem> pageItems;
     private int nowPageId;
     private static int sizeOfPage = 10;
     //悬浮按钮
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private DatabaseLoader db;
+    public static DatabaseLoader db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
         //语音 初始化
         SpeechUtility.createUtility(this, SpeechConstant.APPID + "=59b15923");
+        db = new DatabaseLoader(this.getBaseContext());
         //用ToolBar代替ActionBar
         initToolBar();
         //侧滑菜单的属性设置
@@ -457,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
                     intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
-                    db.addHistory(pageItem);
+//                    db.addHistory(pageItem);
                     SharedPreferences sharedPreferences = getSharedPreferences("visited", Activity.MODE_PRIVATE);
                     sharedPreferences.edit().putBoolean(pageItem.getTitle(), true).apply();
                     ((TextView) view.findViewById(R.id.news_title)).setTextColor(getResources().getColor(R.color.main_newscard_title_visited));
@@ -534,15 +535,15 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "loadAPageOfNewNews.run()  nowCategoryId = " + nowCategoryId + " nowSearchText = " + nowSearchText);
                 if (nowCategoryId == 0) {
                     if (nowSearchText.equals("")) {
-                        mPage = new PagePlus(++nowPageId, sizeOfPage);
+                        pageItems = db.queryPage(++nowPageId, sizeOfPage);
                     } else {
-                        mPage = new PagePlus(nowSearchText, ++nowPageId, sizeOfPage);
+                        pageItems = db.queryPage(nowSearchText, ++nowPageId, sizeOfPage);
                     }
                 } else {
                     if (nowSearchText.equals("")) {
-                        mPage = new PagePlus(nowCategoryId, ++nowPageId, sizeOfPage);
+                        pageItems = db.queryPage(nowCategoryId, ++nowPageId, sizeOfPage);
                     } else {
-                        mPage = new PagePlus(nowSearchText, nowCategoryId, ++nowPageId, sizeOfPage);
+                        pageItems = db.queryPage(nowSearchText, nowCategoryId, ++nowPageId, sizeOfPage);
                     }
                 }
             }
@@ -553,8 +554,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (mPage.cont != null && mPage.cont.length > 0) {
-            for (PageItem pageItem : mPage.cont) {
+        if (pageItems != null && pageItems.size() > 0) {
+            for (PageItem pageItem : pageItems) {
                 mNewsList.add(pageItem);
                 mNewsAdapter.notifyItemInserted(mNewsList.size());
             }
@@ -579,7 +580,6 @@ public class MainActivity extends AppCompatActivity {
 
     //历史模式需要的东西
     private void initHistory() {
-        db = new DatabaseLoader(this.getBaseContext());
         mHistoryRecView = (RecyclerView) findViewById(R.id.main_history_list);
         mHistoryNewsLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mHistoryRecView.setLayoutManager(mHistoryNewsLayoutManager);
@@ -599,7 +599,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
                     intent.putExtra("pictures", pageItem.getImageUrlList().toArray());
-                    db.addHistory(pageItem);
+//                    db.addHistory(pageItem);
                     startActivity(intent);
                 }
             }
