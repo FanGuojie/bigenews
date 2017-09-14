@@ -2,8 +2,10 @@ package garbagemayor.bigenews;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +14,19 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
-public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapter.ViewHolder> {
+import static android.content.ContentValues.TAG;
+
+public class ItemNewsAdapter extends RecyclerView.Adapter<ItemNewsAdapter.ViewHolder> {
 
     private Context mContext;
     private List<NewsList.ListBean> newsList = new ArrayList<>();
+    private ItemNewsImageAdapter itemNewsImageAdapter = new ItemNewsImageAdapter();
     MyCallBack callback;
+//    private List<Boolean> visited = new ArrayList<>();
 
-    NewsListViewAdapter(Context context) {
+    ItemNewsAdapter(Context context) {
         mContext = context;
     }
     void addData (int category) {
@@ -27,7 +34,11 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
             @Override
             public void callbackCall() {
                 newsList.addAll(MainActivity.pageProvider.getNewsList().getList());
+//                for (int i = 0; i < newsList.size(); i++) {
+//                    visited.set(i, false);
+//                }
                 notifyDataSetChanged();
+                itemNewsImageAdapter.notifyDataSetChanged();
             }
         };
 
@@ -37,6 +48,8 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
 
     void clearData() {
         newsList.clear();
+        notifyDataSetChanged();
+        itemNewsImageAdapter.notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -65,22 +78,38 @@ public class NewsListViewAdapter extends RecyclerView.Adapter<NewsListViewAdapte
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.mTitleView.setText(newsList.get(position).getNews_Title());
-        holder.mIntroView.setText(newsList.get(position).getNews_Intro());
-        String url = newsList.get(position).getNews_Pictures();
-        if (!url.equals("")) {
-            LinearLayoutManager l = new LinearLayoutManager(mContext);
-            l.setOrientation(LinearLayoutManager.HORIZONTAL);
-            holder.mImagesView.setLayoutManager(l);
-            ImageAdapter adapter = new ImageAdapter(Arrays.asList(url.split(";")), mContext);
-            holder.mImagesView.setAdapter(adapter);
-        }
-        holder.mTimeView.setText(newsList.get(position).getNews_Time());
         holder.mItem = newsList.get(position);
+        holder.mTitleView.setText(holder.mItem.getNews_Title());
+//        if(visited.get(position)) {
+//            holder.mTitleView.setTextColor(Color.RED);
+//        }
+//        File f = new File(holder.mItem.getNews_ID() + ".json");
+//        if (f.exists()) {
+//            holder.mTitleView.setTextColor(Color.RED);
+//        }
+        holder.mIntroView.setText(holder.mItem.getNews_Intro());
+        String url = holder.mItem.getNews_Pictures();
+        if (!url.equals("")) {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mContext);
+            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            holder.mImagesView.setLayoutManager(linearLayoutManager);
+            List<String> mImages = Arrays.asList(url.split(";| "));
+            Log.d(TAG, "onBindViewHolder: " + mImages.size());
+            for (String image : mImages) {
+                Log.d(TAG, "onBindViewHolder: " + image);
+            }
+            ItemNewsImageAdapter itemNewsImageAdapter = new ItemNewsImageAdapter(mImages);
+            Log.d(TAG, "onBindViewHolder: " + itemNewsImageAdapter.toString());
+            holder.mImagesView.setAdapter(itemNewsImageAdapter);
+            Log.d(TAG, "onBindViewHolder: " + mImages.size());
+        }
+        holder.mTimeView.setText(holder.mItem.getNews_Time());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
+//                holder.mTitleView.setTextColor(Color.RED);
+//                visited.set(position, true);
                 Intent intent = new Intent(context, NewsDetailActivity.class);
                 intent.putExtra("category", 0);
                 intent.putExtra("id", holder.mItem.getNews_ID());

@@ -3,6 +3,7 @@ package garbagemayor.bigenews;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,18 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import static android.content.ContentValues.TAG;
+
 public class NewsListFragment extends Fragment {
 
     private int category;
-    private NewsListViewAdapter mNewsListViewAdapter;
-    private RecyclerView mRecyclerView;
+    private ItemNewsAdapter itemNewsAdapter;
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         category = getArguments().getInt("category");
-        mNewsListViewAdapter = new NewsListViewAdapter(getContext());
-        mNewsListViewAdapter.addData(this.category);
     }
 
     @Override
@@ -33,9 +35,31 @@ public class NewsListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRecyclerView = view.findViewById(R.id.recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(mNewsListViewAdapter);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        Log.d(TAG, "onViewCreated: item");
+        itemNewsAdapter = new ItemNewsAdapter(getContext());
+        recyclerView.setAdapter(itemNewsAdapter);
+        Log.d(TAG, "onViewCreated: item");
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.main_swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
+        itemNewsAdapter.addData(this.category);
+    }
+
+    private void refresh() {
+        swipeRefreshLayout.setRefreshing(true);
+        Log.d(TAG, "refresh: at refresh");
+        itemNewsAdapter.clearData();
+        itemNewsAdapter.addData(this.category);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 }

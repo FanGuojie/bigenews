@@ -2,8 +2,9 @@ package garbagemayor.bigenews;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.widget.LinearLayoutManager;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +14,27 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
-    private List<String> mImages;
-    private Context mContext;
+import static android.content.ContentValues.TAG;
 
-    ImageAdapter(List<String> l, Context context) {
-        mImages = l;
-        mContext = context;
+public class ItemNewsImageAdapter extends RecyclerView.Adapter<ItemNewsImageAdapter.MyViewHolder> {
+    private List<String> mImages;
+    ItemNewsImageAdapter() {}
+
+    ItemNewsImageAdapter(List<String> urls) {
+        mImages = urls;
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder
+    {
+        private ImageView mImage;
+        private String mItem;
+        private View mView;
+        MyViewHolder(View view)
+        {
+            super(view);
+            mView = view;
+            mImage = (ImageView) view.findViewById(R.id.imageView);
+        }
     }
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
@@ -31,7 +46,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position)
     {
-        Glide.with(mContext).load(mImages.get(position)).into(holder.mImage);
+        Glide
+                .with(holder.mView.getContext())
+                .load(mImages.get(position))
+                .placeholder(R.mipmap.loading)
+                .into(holder.mImage);
         holder.mItem = mImages.get(position);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,16 +69,4 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder
         return mImages.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder
-    {
-        private ImageView mImage;
-        private String mItem;
-        private View mView;
-        MyViewHolder(View view)
-        {
-            super(view);
-            mView = view;
-            mImage = (ImageView) view.findViewById(R.id.imageView);
-        }
-    }
 }
