@@ -34,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import at.markushi.ui.CircleButton;
+import garbagemayor.bigenews.newssrc.DatabaseLoader;
 import garbagemayor.bigenews.newssrc.NewsItem;
 import garbagemayor.bigenews.newssrc.PagePlus;
 
@@ -84,7 +85,7 @@ public class ViewActivity extends AppCompatActivity {
             public void run() {
 
                 //Log.d(TAG, "gettingnews"+id);
-                news = PagePlus.getNewsItem(id);
+                news = MainActivity.db.queryNews(id);
             }
         });
         t.start();
