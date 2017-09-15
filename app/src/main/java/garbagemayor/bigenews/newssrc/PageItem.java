@@ -30,6 +30,7 @@ public class PageItem {
     public PageItem(NewsItem item) {
         this.news_Title = item.getTitle();
         this.news_Time = item.getTime();
+        this.news_ID = item.getId();
     }
 
     public String print() {

@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.List;
 
 import garbagemayor.bigenews.newssrc.DatabaseLoader;
+import garbagemayor.bigenews.newssrc.NewsItem;
 import garbagemayor.bigenews.newssrc.PagePlus;
 import garbagemayor.bigenews.newssrc.PageItem;
 
@@ -470,8 +471,13 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(View view, int postion) {
                 //点击第postion条新闻
                 closeInputMethodAnyaway();
+                if(!DatabaseLoader.isNetworkAvailable(MainActivity.this)) {
+                    Toast.makeText(MainActivity.this, "无法连接到网络", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 PageItem pageItem = mNewsList.get(postion);
                 if (pageItem != null) {
+                    Log.d(TAG, "onItemClick: " + pageItem.getTitle());
                     //Toast.makeText(MainActivity.this, "点击：" + pageItem.getTitle(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
                     intent.putExtra("id", pageItem.getId());
@@ -635,29 +641,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(View view, int postion) {
                 //点击第postion条新闻
                 closeInputMethodAnyaway();
-                final String title = db.history.get(postion).getTitle();
-                final PageItem[] pageItem = new PageItem[1];
-                Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            PagePlus p = new PagePlus(title, 1, sizeOfPage);
-                            pageItem[0] = p.cont[0];
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                t.start();
-                try {
-                    t.join();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (pageItem[0] != null) {
+                String id = db.history.get(postion).getId();
+                NewsItem item = db.queryNews(id);
+                if (item != null) {
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
-                    intent.putExtra("id", pageItem[0].getId());
-                    intent.putExtra("pictures", pageItem[0].getImageUrlList().toArray());
+                    intent.putExtra("id", id);
+                    intent.putExtra("pictures", "");
                     startActivity(intent);
 
                 }
@@ -706,29 +695,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(View view, int postion) {
                 //点击第postion条新闻
                 closeInputMethodAnyaway();
-                final String title = db.favorite.get(postion).getTitle();
-                final PageItem[] pageItem = new PageItem[1];
-                Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            PagePlus p = new PagePlus(title, 1, sizeOfPage);
-                            pageItem[0] = p.cont[0];
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                t.start();
-                try {
-                    t.join();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (pageItem[0] != null) {
+                String id = db.favorite.get(postion).getId();
+                NewsItem item = db.queryNews(id);
+                if (item != null) {
                     Intent intent = new Intent(MainActivity.this, ViewActivity.class);
-                    intent.putExtra("id", pageItem[0].getId());
-                    intent.putExtra("pictures", pageItem[0].getImageUrlList().toArray());
+                    intent.putExtra("id", id);
+                    intent.putExtra("pictures", "");
                     startActivity(intent);
 
                 }
